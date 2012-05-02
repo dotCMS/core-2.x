@@ -1,0 +1,2 @@
+alter table tree add index (parent), add constraint FK36739EC4AB08AA foreign key (parent) references inode (inode);
+alter table tree add index (child), add constraint FK36739E5A3F51C foreign key (child) references inode (inode);

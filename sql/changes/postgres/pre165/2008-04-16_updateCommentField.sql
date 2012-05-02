@@ -1,0 +1,5 @@
+update field set field_relation_type = '' where inode in (select field.inode from structure s where field.structure_inode = s.inode and s.name = 'Comments') and field_relation_type is null;
+update field set regex_check = '' where inode in (select field.inode from structure s where field.structure_inode = s.inode and s.name = 'Comments') and  regex_check  is null;
+update field set hint = '' where inode in (select field.inode from structure s where field.structure_inode = s.inode and s.name = 'Comments') and  hint  is null;
+update field set default_value = '' where inode in (select field.inode from structure s where field.structure_inode = s.inode and s.name = 'Comments') and  default_value is null;
+update field set field_values = '' where inode in (select field.inode from structure s where field.structure_inode = s.inode and s.name = 'Comments') and  field_values is null;

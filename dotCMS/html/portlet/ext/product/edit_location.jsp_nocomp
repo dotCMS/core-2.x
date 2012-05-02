@@ -1,0 +1,212 @@
+<%@ page import="java.util.*" %>
+<%@ page import="com.dotmarketing.portlets.webevents.model.*" %>
+<%@ page import="com.dotmarketing.portlets.webevents.struts.*" %>
+<%@ page import="com.dotmarketing.util.*" %>
+<%@ page import="com.dotmarketing.beans.*" %>
+<%@ page import="com.dotmarketing.factories.*" %>
+<%@ include file="/html/portlet/ext/webevents/init.jsp" %>
+<%@ include file="/html/common/messages_inc.jsp" %>
+
+<% 
+	WebEventLocationForm form = (WebEventLocationForm) request.getAttribute(com.dotmarketing.util.WebKeys.WEBEVENTS_LOCATION_FORM);
+	WebEventLocation eventLocation = (WebEventLocation) request.getAttribute(com.dotmarketing.util.WebKeys.WEBEVENTS_LOCATION_EDIT);
+	String referer = (request.getParameter("referer")!=null) ? request.getParameter("referer") : request.getParameter("redirect");
+%>
+
+<!-- NEED TO LOAD FOR THE WYSIWYGS -->
+ <script type="text/javascript">
+   _editor_url = "/html/js/htmlarea/";
+   _editor_lang = "en";
+   _linkURL = '<portlet:actionURL><portlet:param name="struts_action" value="/ext/links/edit_link" /><portlet:param name="cmd" value="edit" /><portlet:param name="popup" value="1" /><portlet:param name="inode" value="" /><portlet:param name="wysiwyg" value="1" /></portlet:actionURL>&child=true&page_width=650';
+   _imageURL = '<portlet:renderURL><portlet:param name="struts_action" value="/ext/wysiwyg/view_wysiwyg" /><portlet:param name="cmd" value="edit_picture" /></portlet:renderURL>&child=true&page_width=650';
+ </script>
+<script type="text/javascript" src="/html/js/htmlarea/htmlarea.js"></script>
+<script type="text/javascript" src="/html/js/htmlarea/dialog.js"></script>
+<script type="text/javascript" src="/html/js/htmlarea/popupwin.js"></script>
+<script type="text/javascript" src="/html/js/htmlarea/lang/en.js"></script>
+<script type="text/javascript" src="/html/js/htmlarea/plugins/ContextMenu/context-menu.js"></script>
+<script type="text/javascript" src="/html/js/htmlarea/plugins/ContextMenu/lang/en.js"></script>
+<script type="text/javascript" src="/html/js/htmlarea/plugins/TableOperations/table-operations.js"></script>
+<script type="text/javascript" src="/html/js/htmlarea/plugins/TableOperations/lang/en.js"></script>
+<!-- NEED TO LOAD FOR THE WYSIWYGS -->
+
+<script language="JavaScript">
+	<liferay:include page="/html/js/calendar/calendar_js_box_ext.jsp" flush="true">
+		<liferay:param name="calendar_num" value="2" />
+	</liferay:include>
+	<%@ include file="/html/portlet/ext/webevents/edit_location_js_inc.jsp" %>  
+</script>
+<script language="JavaScript" src="/html/js/states_and_countries.js">
+</script>
+
+<body onload="initDocument()">
+<liferay:box top="/html/common/box_top.jsp" bottom="/html/common/box_bottom.jsp">
+	<liferay:param name="box_title" value="<%= (InodeUtils.isSet(eventLocation.getInode())) ? LanguageUtil.get(pageContext, \"edit-webevent-location\") : LanguageUtil.get(pageContext, \"add-webevent-location\") %>" />
+
+	<table align="center" cellpadding="3" cellspacing="1" valign="middle" bgcolor="white" border="0" width="750">
+	<html:form action='/ext/webevents/edit_location' styleId="webEventLocationForm">   
+		<input type="hidden" name="dispatch" id="dispatch" value="save">
+		<html:hidden property="inode" />
+		<html:hidden property="webEventInode" />
+		<html:hidden property="title" />
+		<input type="hidden" name="submitParent" id="submitParent" value="">
+		<input type="hidden" name="referer" id="referer" value="<%=request.getParameter("referer")%>">
+	    <input type="hidden" id="redirect" name="<portlet:namespace />redirect" value="<portlet:renderURL><portlet:param name="struts_action" value="/ext/webevents/view_events" /></portlet:renderURL>">
+
+		<tr>
+			<td align="right" width="100%" colspan="6">
+			<span class="required"></span> &nbsp;<span class="mRed">Required Fields</span>
+			</td>
+		</tr>
+		<tr>
+			<td width="10">
+			&nbsp;
+			</td>
+			<TD width="175"><B>Event Title:</B></TD>
+			<TD colspan="4">
+			<%= form.getTitle() %>
+			</TD>
+		</tr>
+		<TR>
+			<td width="10">
+			<span class="required"></span> 
+			</td>
+			<TD width="175">City:</TD>
+			<TD>
+			<html:text property="city" size="30" styleClass="text" styleId="city" />
+			</TD>
+			<td width="10">
+			<span class="required"></span> 
+			</td>
+			<TD width="175">State:</TD>
+			<TD>
+			<script language="JavaScript">
+			writeStatesSelect("state", "<%=form.getState()%>");
+			</script>
+			</TD>
+		</tr>
+		
+		<TR>
+			<td width="10">
+			<span class="required"></span> 
+			</td>
+			<TD width="175">Start Date:</TD>
+			<TD>
+			<html:text property="strStartDate" readonly="true" size="20" styleClass="text" styleId="strStartDate" onclick="_EXT_WEBEVENTS_calendarOnClick_0();" />
+			<img align="absmiddle" style="vertical-align: middle;" border="0" hspace="0" id="<portlet:namespace />calendar_input_0_button" src="<%= COMMON_IMG %>/calendar/calendar.gif" vspace="0" onClick="<portlet:namespace />calendarOnClick_0();">
+			</TD>
+			<td width="10">
+			<span class="required"></span> 
+			</td>
+			<TD width="175">End Date:</TD>
+			<TD valign="absmiddle">
+			<html:text property="strEndDate" readonly="true" size="20" styleClass="text" styleId="strEndDate" onclick="_EXT_WEBEVENTS_calendarOnClick_1();"/>
+		    <img align="absmiddle" style="vertical-align: middle;" border="0" hspace="0" id="<portlet:namespace />calendar_input_1_button" src="<%= COMMON_IMG %>/calendar/calendar.gif" vspace="0" onClick="<portlet:namespace />calendarOnClick_1();">
+			</TD>
+		</tr>
+		<TR>
+			<td width="10">
+			&nbsp;
+			</td>
+			<TD width="175">Hotel Name:</TD>
+			<TD colspan="4">
+			<html:text property="hotelName" size="30" styleClass="text" styleId="hotelName" />
+			</TD>
+		</TR>		
+		<TR>
+			<td width="10">
+			&nbsp;
+			</td>
+			<TD width="175">Hotel Information Link:</TD>
+			<TD colspan="4">
+			<html:text property="selectedhotelLink" size="30" styleClass="text" styleId="selectedhotelLink" />
+			<html:hidden property="hotelLink" styleId="hotelLink"/>
+			<img src="/portal/images/icon_upload.gif" onmouseup="smallPopUp(event,'hotelLink');">
+			<% String linkName =  "hotelLink"; %>
+			<% String inode = String.valueOf(form.getHotelLink()); %>
+			<%@ include file="/html/portlet/ext/contentlet/edit_contentlet_link_menu.jsp" %>  
+			</TD>
+		</TR>		
+		<TR>
+			<td width="10">
+			&nbsp;
+			</td>
+			<TD width="175">Past Event Information:</TD>
+			<TD colspan="4">
+			<html:text property="selectedpastEventLink" size="30" styleClass="text" styleId="selectedpastEventLink" />
+			<html:hidden property="pastEventLink" styleId="pastEventLink" />
+			<img src="/portal/images/icon_upload.gif" onmouseup="smallPopUp(event,'pastEventLink');">
+			<% linkName =  "pastEventLink"; %>
+			<% inode = String.valueOf(form.getPastEventLink()); %>
+			<%@ include file="/html/portlet/ext/contentlet/edit_contentlet_link_menu.jsp" %>  
+			</td>
+		</TR>		
+		
+		<TR>
+			<td width="10">
+			<span class="required"></span> 
+			</td>
+			<TD width="175">Partner Price:</TD>
+			<TD>
+			<html:text property="partnerPrice" size="30" styleClass="text" styleId="partnerPrice" />
+			</TD>
+			<td width="10">
+			<span class="required"></span> 
+			</td>
+			<TD width="175">Non-Partner Price:</TD>
+			<TD>
+			<html:text property="nonPartnerPrice" size="30" styleClass="text" styleId="nonPartnerPrice" />
+			</TD>
+		</tr>
+		<TR>
+			<td width="10">
+			&nbsp;
+			</td>
+			<TD width="175" valign="top">Short Description:</TD>
+			<TD colspan="4">
+			<html:textarea property="shortDescription" styleClass="text" styleId="shortDescription" style="height: 250px; width: 600;" />
+			<img style="cursor:hand" id="textmode1" src="/portal/images/btn_html_on.gif" onclick="setMode(1,'textmode')"><img id="wysiwyg1" style="cursor:hand" src="/portal/images/btn_wysiwyg_off.gif" onclick="setMode(1,'wysiwyg')">
+			</TD>
+		</TR>		
+
+		<TR>
+			<td width="10">
+			&nbsp;
+			</td>
+			<TD width="175" valign="top">Email Receipt:</TD>
+			<TD colspan="4">
+			<html:textarea property="textEmail" styleClass="text" styleId="textEmail" style="height: 250px; width: 600;"/>
+			<img style="cursor:hand" id="textmode2" src="/portal/images/btn_html_on.gif" onclick="setMode(2,'textmode')"><img id="wysiwyg2" style="cursor:hand" src="/portal/images/btn_wysiwyg_off.gif" onclick="setMode(2,'wysiwyg')">
+			<BR>
+			(Text message to be included on email receipt after registration)
+			</TD>
+		</TR>		
+
+		<TR>
+			<TD align="center" colspan="6">
+			<BR>
+				<table cellspacing="1" cellpadding="4" align="center" width="100%">
+					<tr>
+						<td align="center">
+						   <button dojoType="dijit.form.Button" onClick="doSubmit()">Save</button>
+						</td>
+						<%if(InodeUtils.isSet(form.getInode())){%>
+							<td align="center">
+							  <button dojoType="dijit.form.Button" onClick="deleteEventLocation()">Delete</button>
+							</td>
+						<%}%>
+						<td align="center">
+						  <button dojoType="dijit.form.Button" onClick="window.location.href='<%=referer%>'">Cancel</button>
+						</td>
+					</tr>
+				</table>
+			</TD>
+		</TR>
+	</html:form>
+	</table>
+
+</liferay:box>
+</body>
+
+""  
+"" 

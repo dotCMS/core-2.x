@@ -1,0 +1,1 @@
+update tree set tree_order=0 where tree_order is null;

@@ -1,0 +1,1 @@
+CREATE INDEX idx_users_groups ON users_groups USING BTREE (userid, groupid);

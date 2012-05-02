@@ -1,0 +1,1 @@
+alter table web_form alter column custom_fields type text;

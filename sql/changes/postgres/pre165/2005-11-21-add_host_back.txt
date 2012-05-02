@@ -1,0 +1,8 @@
+-- There is no sql script here but you need to execute the jsp located in /html/portlet/ext/utils/AssignHosts.jsp
+-- to reassign the hosts back to the templates, containers and contentlets
+-- This jsp tries to find the correct host to assign based on the parent folder that the asset had before,
+-- but if the asset was created recently it could be without a parent folder, in this case the default host will be
+-- assigned to the asset
+
+
+-- David

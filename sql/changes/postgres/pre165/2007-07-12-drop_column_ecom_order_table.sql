@@ -1,0 +1,1 @@
+alter table ecom_order drop column order_id;

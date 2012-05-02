@@ -1,0 +1,60 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title></title>
+</head>
+<body bgcolor="#EBE8DA">
+
+<!-- velocity variables  for styles-->
+
+#set($h1='size="4" color="#6C6C69"')
+#set($h2='size="3" color="#60605D"')
+#set($link='color="#2F5090"')
+#set($all='size="3" color="#60605F"')
+
+<table cellpadding="0" cellspacing="0" border="0" width="660" bgcolor="#FFFFFF">
+  <tr>
+    <td rowspan="3" width="20"><img src="/html/images/shim.gif" alt="" /></td>
+	<td width="620">&nbsp;</td>
+    <td rowspan="3" width="20"><img src="/html/images/shim.gif" alt="" /></td>
+  </tr>
+
+  <tr>
+	 <td align="left">
+	 <img src="/html/images/skin/logo.gif"/>
+	 </td>
+  </tr>
+
+   <tr>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+
+<br/>
+
+<table cellpadding="0" cellspacing="0" border="0" width="660" bgcolor="#FFFFFF">
+  <tr>
+    <td rowspan="3" width="20"><img src="/html/images/shim.gif" alt="" /></td>
+	<td width="620">&nbsp;</td>
+    <td rowspan="3" width="20"><img src="/html/images/shim.gif" alt="" /></td>
+  </tr>
+
+  <tr>
+	 <td align="left">
+
+	 <font $all>
+		<p><b>$!{taskChange}</b></p>
+		<p><b>Task:</b> <a href="${taskLink}">$!{task.getTitle()}</p>
+		<p><b>Created:</b> $!{UtilMethods.dateToHTMLDate($task.getCreationDate(), "MM/dd/yyyy hh:mm:ss a")}</p>
+		<p><b>Author:</b> $!{taskAuthor}</p>
+		<p><b>Modified:</b> $!{UtilMethods.dateToHTMLDate($task.getModDate(), "MM/dd/yyyy hh:mm:ss a")}</p>
+		<p><b>Asignee:</b> $!{taskAssignedTo}</p>
+		<p><b>Due Date:</b> $!{UtilMethods.dateToHTMLDate($task.getDueDate(), "MM/dd/yyyy hh:mm:ss a")}</p>
+		<p><b>Status:</b> $!{task.getStatus()}</p>
+
+	 </font>
+	 </td>
+  </tr>
+</table>
+</body>
+</html>

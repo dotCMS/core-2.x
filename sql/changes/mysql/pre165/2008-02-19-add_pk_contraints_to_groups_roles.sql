@@ -1,0 +1,1 @@
+ALTER TABLE groups_roles ADD CONSTRAINT groups_roles_pkey PRIMARY KEY (groupid, roleid);

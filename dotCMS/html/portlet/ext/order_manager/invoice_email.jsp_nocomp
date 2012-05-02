@@ -1,0 +1,124 @@
+<%@ include file="/html/portlet/ext/order_manager/init.jsp" %>
+<%@ include file="/html/common/messages_inc.jsp" %>
+<%@ page import="com.dotmarketing.util.*" %>
+<%@ page import="com.dotmarketing.portlets.product.model.Product" %>
+<%@ page import="com.dotmarketing.portlets.order_manager.struts.OrderForm" %>
+<%@ page import="com.dotmarketing.portlets.order_manager.struts.OrderItemForm" %>
+<form action="/dotCMS/viewCart" method="post">
+<%
+OrderForm orderForm = UtilMethods.loadOrderForm(request);
+List<DiscountCode> discounts = UtilMethods.getDiscountsByOrder(orderForm);
+float subTotal = 0;
+%>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr>
+		<td><b>Thank you for your order # <%=orderForm.getInode() %></b></td>
+	</tr>
+	<tr>
+		<td>
+		Here is a summary of your order. You will be able to view the status and order history on "Your Profile" information.<br>
+		You will also get an email with tracking information once the order is been shipped.
+		</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><b>Items Ordered:</b></td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+	<tr>
+	<td>
+	<!-- ITEMS -->
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+		<tr>
+			<!--<td width="20%"><b>Image</b></td>-->
+			<td width="50%"><b>Item Description</b></td>
+			<td width="15%"><b>Qty</b></td>
+			<td width="15%"><b>Price Each</b></td>
+			<td width="15%"><b>Amount</b></td>
+		</tr>
+		<%for(int i = 0; i < orderForm.getOrderItemList().size();i++)
+		  {
+			OrderItemForm orderItem = orderForm.getOrderItemList().get(i);
+			Product product = UtilMethods.getProductbyProductFormaId(orderItem.getProductInode());			
+		 %>
+		<tr>
+		<td><%=product.getTitle() %> <br> <%=orderItem.getFormatName() %></td>
+			<td><%=orderItem.getItemQty() %></td>
+			<td>
+			<% 
+			float priceAmount = UtilMethods.getItemPriceWithDiscount(orderItem,discounts);
+			float lineTotal = orderItem.getItemQty() * orderItem.getItemPrice();
+			subTotal += lineTotal;
+			%>				
+				$ <%=UtilMethods.toPriceFormat(priceAmount)%>
+			</td>
+			<td>$ <%=UtilMethods.toPriceFormat(lineTotal)%></td>
+		</tr>
+			<%}%>
+		<tr>
+			<!--<td>&nbsp;</td>-->
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>Sub-Total:</td>
+			<td>$ <%=UtilMethods.toPriceFormat(subTotal)%></td>
+		</tr>
+		<tr>
+			<!--<td>&nbsp;</td>-->
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td nowrap>Sub-Total - Discount:</td>
+			<td>$ <%=UtilMethods.toPriceFormat(orderForm.getOrderSubTotalDiscount())%></td>
+		</tr>
+		<tr>			
+			<!--<td>&nbsp;</td>-->
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td nowrap>Shipping and Handling:</td>
+			<td>$ <%=UtilMethods.toPriceFormat(orderForm.getOrderShipping())%></td>
+		</tr>
+		<%if(orderForm.getShippingState().equals("FL")){ %>
+		<tr>			
+			<!--<td>&nbsp;</td>-->
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>Tax (6.5%) FL:</td>
+			<td>$ <%=UtilMethods.toPriceFormat(orderForm.getOrderTax())%></td>
+		</tr>
+		<%} %>
+		<tr>			
+			<!--<td>&nbsp;</td>-->
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>Total:</td>
+			<td>$ <%=UtilMethods.toPriceFormat(orderForm.getOrderTotal())%></td>
+		</tr>
+	</table>
+	<!-- END ITEMS -->
+	</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+	<tr>
+		<td>
+		<table>
+			<tr><td>Products are shipped upon receipt of payment.</td></tr>
+			<tr>
+			<td>
+				Please print this page and place it with the check in a stamped envelope. Make checks payable to: <b>Fire Starter Publishing</b>, PO Box 730, Gulf Breeze, FL 32562-0730.
+			</td>
+			</tr>
+			<tr><td>Total: $ <%=UtilMethods.toPriceFormat(orderForm.getOrderTotal())%></td></tr>
+			<!--<tr><td>Bank Name: $!orderForm.checkBankName</td></tr>
+			<tr><td>Check Number: $!orderForm.checkNumber</td></tr>-->
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+	<tr>
+		<td>
+			Should special shipping procedures be required or if you have any questions please contact us at 866-354-3473.<br>
+			Thank you for your order. We appreciate your business and look forward to serving you in the future.
+		</td>
+	</tr>
+</table>
+</form>

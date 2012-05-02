@@ -1,0 +1,256 @@
+<%
+    com.dotmarketing.portlets.jobs.struts.ResumeForm r = (com.dotmarketing.portlets.jobs.struts.ResumeForm)request.getAttribute("ResumeForm");
+
+    com.dotmarketing.portlets.jobs.model.Resume resume = null;
+    if (request.getAttribute(com.dotmarketing.util.WebKeys.RESUME_EDIT)!=null) {
+		resume = (com.dotmarketing.portlets.jobs.model.Resume) request.getAttribute(com.dotmarketing.util.WebKeys.RESUME_EDIT);
+	}
+	else {
+		resume = (com.dotmarketing.portlets.jobs.model.Resume) com.dotmarketing.factories.InodeFactory.getInode(request.getParameter("inode"),com.dotmarketing.portlets.jobs.model.Resume.class);
+	}
+
+	java.util.Map params = new java.util.HashMap();
+	params.put("struts_action",new String[] {"/ext/jobs/view_resumes"});
+	String referer = com.dotmarketing.util.PortletURLUtil.getActionURL(request,WindowState.MAXIMIZED.toString(),params);
+
+%>
+<%@ include file="/html/portlet/ext/jobs/init.jsp" %>
+<%@ include file="/html/common/messages_inc.jsp" %>
+<script>
+		function doSubmit(){
+			form = document.getElementById("fm");
+			form.cmd.value = "<%=Constants.ADD%>";
+			form.action = '<portlet:actionURL><portlet:param name="struts_action" value="/ext/jobs/edit_resume" /></portlet:actionURL>';
+			submitForm(form);
+		}
+		function doDelete() {
+			if(confirm("Are you sure you would like to delete this listing?")) {
+				window.location = '<portlet:actionURL><portlet:param name="struts_action" value="/ext/jobs/edit_resume" /><portlet:param name="inode" value="<%=String.valueOf(resume.getInode())%>" /><portlet:param name="<%= Constants.CMD %>" value="<%=Constants.DELETE%>" /><portlet:param name="referer" value="<%=referer%>" /></portlet:actionURL>';
+			} else return false;
+		}
+		function deleteFile() {
+			form = document.getElementById("fm");
+			form.cmd.value = "deletefile";
+			form.action = '<portlet:actionURL><portlet:param name="struts_action" value="/ext/jobs/edit_resume" /></portlet:actionURL>';
+			submitForm(form);
+		}
+				
+	</script>
+
+<liferay:box top="/html/common/box_top.jsp" bottom="/html/common/box_bottom.jsp">
+	<liferay:param name="box_title" value="<%= LanguageUtil.get(pageContext, \"add-resume\") %>" />
+	
+	<html:form action="/ext/jobs/edit_resume" styleId="fm" onsubmit="doSubmit();">
+	<input name="<%= Constants.CMD %>" type="hidden" value="<%=Constants.ADD%>">
+	<input name="<portlet:namespace />redirect" type="hidden" value="<portlet:renderURL><portlet:param name="struts_action" value="/ext/jobs/view_resumes" /></portlet:renderURL>">
+    <html:hidden property="inode"/>
+
+	<div align="center"><center>
+    <table cellpadding="0" cellspacing="0" border="0" width="75%">
+    	<tr>
+    		<td>
+			   <button dojoType="dijit.form.Button" name="B1" onClick="doSubmit();">Save</button>
+    		</td>
+    		<td align=right>
+			   <button dojoType="dijit.form.Button" onclick="doDelete()">Delete</button>
+    		</td>
+    	</tr>
+    </table>	
+    <BR>
+	<table cellpadding="0" cellspacing="0" border="0" width="75%">
+		<tr>
+			<td>
+				<table width="100%" border="0" cellspacing="1" cellpadding="4" class="beta">
+		            <tr>
+						<td colspan="2" class="beta"><font class="beta" size="2"><strong>Your Information</strong></td>
+					</tr>
+				    <tr>
+		              <td  align="right" width="30%"><font class="bg" size="2"><strong>Name</strong></font></td>
+		              <td  width="70%"><html:text property="name" size="20" maxlength="150" styleClass="textbox"/></td>
+		            </tr>
+		            <tr>
+		              <td  align="right"><font class="bg" size="2"><strong>Address</strong></font></td>
+		              <td ><html:text property="streetname1" size="20" maxlength="250" styleClass="textbox" /></td>
+		            </tr>
+		            <tr>
+		              <td  align="right"><font class="bg" size="2"><strong>Address</strong></font></td>
+		              <td ><html:text property="streetname2" size="20" maxlength="250" styleClass="textbox" /></td>
+		            </tr>
+		            <tr>
+		              <td  align="right"><font class="bg" size="2"><strong>City</strong></font></td>
+		              <td ><html:text property="city" size="20" maxlength="50" styleClass="textbox" /></td>
+		            </tr>
+		            <tr>
+		              <td  align="right"><font class="bg" size="2"><strong>State</strong></font></td>
+		              <td ><html:text property="state" size="20" maxlength="50" styleClass="textbox" /></td>
+		            </tr>
+		            <tr>
+		              <td  align="right"><font class="bg" size="2"><strong>Zip</strong></font></td>
+		              <td ><html:text property="zip" size="20" maxlength="50" styleClass="textbox" /></td>
+		            </tr>
+		            <tr>
+		              <td  align="right"><font class="bg" size="2"><strong>Home Phone</strong></font></td>
+		              <td ><html:text property="phone" size="20" maxlength="50" styleClass="textbox" /></td>
+		            </tr>
+		            <tr>
+		              <td  align="right"><font class="bg" size="2"><strong>Fax</strong></font></td>
+		              <td ><html:text property="fax" size="20" maxlength="50" styleClass="textbox" /></td>
+		            </tr>
+		            <tr>
+		              <td  align="right"><font class="bg" size="2"><strong>E-Mail</strong></font></td>
+		              <td ><html:text property="email" size="20" maxlength="250" styleClass="textbox" /></td>
+		            </tr>
+				</table>
+				
+		        <img src="/portal/images/shim.gif" width="1" height="20" alt="" border="0"><br>
+				
+				<table width="100%" border="0" cellspacing="1" cellpadding="4" class="beta">
+					<tr>
+						<td colspan="2" class="beta"><font class="beta" size="2"><strong>Exclusions</strong></font></td>
+					</tr>
+					<tr>
+						<td colspan=2 >
+							<font class="bg" size="2">Firms or organizations resume SHOULD NOT be sent to
+			              	</font>
+						</td>
+		            </tr>
+		            <tr>
+		              <td  align="center"><html:text property="exclusion1" size="20" maxlength="150" styleClass="textbox" /></td>
+		              <td  align="center"><html:text property="exclusion2" size="20" maxlength="150" styleClass="textbox" /></td>
+		            </tr>
+		            <tr>
+		              <td  align="center"><html:text property="exclusion3" size="20" maxlength="150" styleClass="textbox" /></td>
+		              <td  align="center"><html:text property="exclusion4" size="20" maxlength="150" styleClass="textbox" /></td>
+		            </tr>
+		        </table>
+				
+		        <img src="/portal/images/shim.gif" width="1" height="20" alt="" border="0"><br>
+				
+				<table width="100%" border="0" cellspacing="1" cellpadding="4" class="beta">
+					<tr>
+						<td colspan="2" class="beta"><font class="beta" size="2"><strong>Objective</strong></font></td>
+		            </tr>
+		            <tr>
+		              	<td  colspan="2" height="54" align=center>
+					  		<html:textarea rows="20" property="objective" cols="50" styleClass="textarea2"/>
+						</td>
+		            </tr>
+		        </table>
+				   
+				<img src="/portal/images/shim.gif" width="1" height="20" alt="" border="0"><br>
+				
+				<table width="100%" border="0" cellspacing="1" cellpadding="4" class="beta">
+					<tr>
+						<td colspan="2" class="beta"><font class="beta" size="2"><strong>Location Requirements</strong></font></td>
+		            </tr>
+		            <tr>
+		              	<td  colspan="2" height="54" align=center>
+					  		<html:textarea rows="20" property="location" cols="50" styleClass="textarea2"/>
+						</td>
+		            </tr>
+		        </table>
+				   
+				<img src="/portal/images/shim.gif" width="1" height="20" alt="" border="0"><br>
+				
+				<table width="100%" border="0" cellspacing="1" cellpadding="4" class="beta">
+					<tr>
+						<td colspan="2" class="beta"><strong><font class="beta" size="2">Salary Requirements</strong> - (Optional but recommended)</font></td>
+		            </tr>
+		            <tr>
+		              	<td  colspan="2" height="54" align=center>
+					  		<html:textarea rows="20" property="salary" cols="50" styleClass="textarea2"/>
+						</td>
+		            </tr>
+				</table>
+				<img src="/portal/images/shim.gif" width="1" height="20" alt="" border="0"><br>
+				
+				<% if (com.dotmarketing.util.InodeUtils.isSet(resume.getInode())) { %>
+				<table width="100%" border="0" cellspacing="1" cellpadding="4" class="beta">
+					<tr>
+						<td colspan="2" class="beta">
+						  	<strong><font class="beta" size="2">Uploaded Files:</strong></font> 
+						</td>
+		            </tr>
+		            <tr>
+		              	<td  colspan="2" height="54" align=center>
+						<% 
+							java.util.List files = com.dotmarketing.portlets.fileupload.factories.FileFactory.getChildrenFilesByOrder(resume);
+						%>
+						<%if(files.size() >= 1){%>	
+						<table cellspacing="0" cellpadding="2" align="left">						
+						<tr>
+							<% com.dotmarketing.portlets.fileupload.model.FileUpload f = (com.dotmarketing.portlets.fileupload.model.FileUpload) files.get(0); %>
+							<TD nowrap>
+								<font class="gamma" size="2">
+								<a href="/resumes/<%=String.valueOf(f.getInode())%>.<%=com.dotmarketing.util.UtilMethods.getFileExtension(f.getFileName())%>"><img src="/icon?i=<%=f.getFileName()%>" width="16" height="16" align=absmiddle border="0" vspace=1 hspace=1></a>
+								<a href="/resumes/<%=String.valueOf(f.getInode())%>.<%=com.dotmarketing.util.UtilMethods.getFileExtension(f.getFileName())%>"><%=f.getFileName()%></a>
+							</TD>				
+							<TD nowrap align=center><font class="gamma" size="2">
+								(<a href="javascript: deleteFile();">del</a>) </font>
+							</TD>
+						</tr>
+						</table>
+						<%} else { %>
+						There are no uploaded files for this Resume
+						<% } %>
+					  	</td>
+		            </tr>
+				<table>
+				<% } %> 
+				<br>
+				
+				<table width="100%" border="0" cellspacing="1" cellpadding="4" class="beta">
+					<tr>
+						<td colspan="2" class="beta">
+						  	<strong><font class="beta" size="2">Brief description of qualifications:</strong></font> 
+						</td>
+		            </tr>
+					<tr>
+						<td colspan=2 ><font class="bg" size="2">(Include education, certification, and categories of specialization in 100 words or less.)</font></td>
+					</tr>
+		            <tr>
+		              	<td  colspan="2" height="54" align=center>
+					  		<html:textarea rows="20" property="qualification" cols="50" styleClass="textarea2"/>
+						</td>
+		            </tr>
+				<table>
+				
+				<br>
+				
+				<table width="100%" border="0" cellspacing="1" cellpadding="4" class="beta">
+					<tr>
+						<td colspan="2"  class="beta"><font class="bg" size="2"><B>For Corenet Use</B></font></td>
+					</tr>	
+								
+					<tr>
+						<td bgcolor="#FFFFFF" align="right"><font class="bg" size="2"><strong>Activated</strong></font></td>
+						<td bgcolor="#FFFFFF">
+						<html:radio property="active" value="true"/>Yes
+						<html:radio property="active" value="false"/>No</td>
+					</tr>
+					<tr>
+						<td bgcolor="#FFFFFF" align="right"><strong>Expiration Date</strong></td>
+						<td bgcolor="#FFFFFF"><html:text property="webexpirationdate" /></td>
+					</tr>		            
+		          </table>
+				  
+				  <br>
+				  
+				  <table border="0" cellspacing="0" cellpadding="6" align=center height=30>
+					<tr>
+						<td>
+						    <button dojoType="dijit.form.Button" name="B1" onClick="doSubmit()">Save</button>
+						</td>
+						<td>
+						    <button dojoType="dijit.form.Button" type="reset" name="B2">Clear</button>
+						</td>
+					</tr>
+				</table>
+			</td>
+      	</tr>
+	</table> 
+      </center></div>
+
+    </html:form>
+
+</liferay:box>

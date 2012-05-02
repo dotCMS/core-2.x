@@ -1,0 +1,1 @@
+ALTER TABLE TAG MODIFY (user_id varchar2(255) null);

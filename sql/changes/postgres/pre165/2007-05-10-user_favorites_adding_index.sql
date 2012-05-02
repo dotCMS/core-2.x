@@ -1,0 +1,1 @@
+CREATE INDEX idx_favorites_user_id ON user_favorites USING btree (user_id);

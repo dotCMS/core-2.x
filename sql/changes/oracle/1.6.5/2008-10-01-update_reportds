@@ -1,0 +1,1 @@
+update report_asset set ds = 'jdbc/dotCMSPool' where ds like 'jdbc/LiferayPool';

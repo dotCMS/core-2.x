@@ -1,0 +1,238 @@
+<%@ include file="/html/portlet/ext/organization/init.jsp" %>
+<%@ page import="com.dotmarketing.portlets.organization.model.Organization" %>
+<%@ page import="com.dotmarketing.util.UtilMethods" %>
+<%@ page import="com.liferay.portal.util.Constants" %>
+<%@ page import="com.dotmarketing.business.APILocator" %>
+<%@ page import="com.dotmarketing.portlets.categories.business.CategoryAPI" %>
+<%@ page import="com.dotmarketing.portlets.categories.model.Category" %>
+<%@ page import="com.dotmarketing.portlets.organization.factories.OrganizationFactory" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="java.util.List" %>
+<%@ include file="/html/common/messages_inc.jsp" %>
+<%
+
+	CategoryAPI catAPI = APILocator.getCategoryAPI();
+
+	int pageNumber = 1;
+	if (request.getParameter("pageNumber")!=null) {
+		pageNumber = Integer.parseInt(request.getParameter("pageNumber")); 
+	}
+	
+	int perPage = com.dotmarketing.util.Config.getIntProperty("PER_PAGE");
+	int minIndex = (pageNumber - 1) * perPage;
+	int maxIndex = perPage * pageNumber;
+
+	String orderby = request.getParameter("orderby");
+	String keywords = (request.getParameter("keywords")!=null) ? request.getParameter("keywords") : "";
+	if (!com.dotmarketing.util.UtilMethods.isSet(orderby)) orderby = "title";
+	java.util.Map params = new java.util.HashMap();
+	params.put("struts_action",new String[] {"/ext/organization/view_organizations"});
+	String linkUrl = com.dotmarketing.util.PortletURLUtil.getActionURL(request,WindowState.MAXIMIZED.toString(),params);
+
+
+%>
+
+<script language="JavaScript">
+	function addOrganization() {
+		window.location.href = '<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>"><portlet:param name="struts_action" value="/ext/organization/edit_organization" /><portlet:param name="system" value="false" /><portlet:param name="cmd" value="edit" /></portlet:actionURL>';
+	}
+	function addOrganization(parentId) {
+		window.location.href = '<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>"><portlet:param name="struts_action" value="/ext/organization/edit_organization" /><portlet:param name="system" value="false" /><portlet:param name="cmd" value="edit" /></portlet:actionURL>&parentSystem=' + parentId;
+	}
+	function addSystem() {
+		window.location.href = '<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>"><portlet:param name="struts_action" value="/ext/organization/edit_organization" /><portlet:param name="system" value="true" /><portlet:param name="cmd" value="edit" /></portlet:actionURL>';
+	}
+	function deleteOrganization(inode) {
+		if(confirm("Are you sure you want to delete this organization (this cannot be undone) ?")){
+			form = document.getElementById("fm");
+			form.<portlet:namespace />cmd.value = '<%=Constants.DELETE%>';
+			form.inode.value=inode;
+			form.<portlet:namespace />redirect.value = '<portlet:renderURL><portlet:param name="struts_action" value="/ext/organization/view_organizations" /><portlet:param name="orderby" value="<%=orderby%>" /></portlet:renderURL>';
+			form.action = '<portlet:actionURL><portlet:param name="struts_action" value="/ext/organization/edit_organization" /></portlet:actionURL>';
+			submitForm(form);
+		}
+	}
+	function showAllOrganizations() {
+		form = document.getElementById("fm_EXT_ORG_");
+		form.keywords.value = "";
+		form.categories.value = "";
+		submitForm(form);
+	}
+
+</script>
+<liferay:box top="/html/common/box_top.jsp" bottom="/html/common/box_bottom.jsp">
+	<liferay:param name="box_title" value="Viewing Schools and Systems" />
+
+<table align="center" border="0" cellpadding="2" cellspacing="0" height=90>
+	<html:form action="/ext/organization/view_organizations" styleId="fm_EXT_ORG_">
+	<tr>
+		<td>
+			Keywords:
+		</td>
+		<td>
+			<html:text styleClass="form-text" property="keywords" size="45"/>
+		</td>
+	</tr>
+	<%
+		com.dotmarketing.portlets.entities.model.Entity entity = com.dotmarketing.portlets.entities.factories.EntityFactory.getEntity("Organization");
+		java.util.List cats = com.dotmarketing.portlets.entities.factories.EntityFactory.getEntityCategories(entity);
+		Iterator catsIter = cats.iterator();
+		while (catsIter.hasNext()) {
+			com.dotmarketing.portlets.categories.model.Category category = (com.dotmarketing.portlets.categories.model.Category) catsIter.next();
+			List<Category> children = catAPI.getChildren(category);
+			pageContext.setAttribute("childrenCat",children.iterator());
+			if (children.size()>1) {
+	%>
+		<tr>
+			<td width="150">
+			<%= category.getCategoryName() %>:
+			</td>				
+			<td>
+			<html:select property="categories" size="1" style="width=275px;">
+          		<option value=""><-- Select <%= category.getCategoryName() %> --></option>
+        		<html:options collection="childrenCat" labelProperty="categoryName" property="inode"/>
+        	</html:select>
+			</td>
+		</tr>
+			<% } %>
+	<% } %>	
+	<tr>
+		<td colspan="2" align="center">
+			<button dojoType="dijit.form.Button" type="submit" name="Search">Search</button>
+			<button dojoType="dijit.form.Button" name="Show All" onClick="showAllOrganizations()">Show All</button>
+		</td>
+	</tr>
+	</html:form>
+	<tr><td height=100% colspan="2">&nbsp;</td></tr>
+</table>
+
+	<table border="0" cellpadding="2" cellspacing="2" width="100%">
+	<form id="fm" method="post">
+	<input type="hidden" name="<portlet:namespace />cmd" value="">
+	<input type="hidden" name="<portlet:namespace />redirect" value="">
+	<input type="hidden" name="inode" value="">
+	
+		<tr>
+			<td>
+				<table border="0" cellpadding="4" cellspacing="1" width="100%">
+					<tr class="beta">
+						<Td>
+							<strong>Actions</strong>
+						</td>						
+						<Td>
+							<strong><font class="beta" size="2"><a class="beta" href="<%=linkUrl%>&orderby=title">Title</a></font></strong>
+						</td>
+						<Td>
+							<strong><font class="beta" size="2"><a class="beta" href="<%=linkUrl%>&orderby=is_system">System</a></font></strong>
+						</td>
+						<Td>
+							<strong><font class="beta" size="2"><a class="beta" href="<%=linkUrl%>&orderby=partner_url">Private Site</a></font></strong>
+						</td>
+					</tr>
+
+					<% java.util.List organizations = (java.util.List) request.getAttribute(com.dotmarketing.util.WebKeys.ORGANIZATION_VIEW);%>
+					<% for (int k=minIndex;k<maxIndex && k<organizations.size();k++) { %>
+						<% Organization organization = (Organization) organizations.get(k); %>
+						<tr bgcolor="#eeeeee">
+							<td width="50" nowrap align="center">
+								<a class="bg" href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>"><portlet:param name="struts_action" value="/ext/organization/edit_organization" /><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.EDIT %>" /><portlet:param name="inode" value="<%= String.valueOf(organization.getInode()) %>" /></portlet:actionURL>">
+								<img src="/portal/images/icon_edit.gif" border="0"></a><a href="javascript:deleteOrganization('<%= String.valueOf(organization.getInode()) %>')"><img src="/portal/images/icon_delete.gif" border="0"></a>
+							</td>
+							<td>
+								<font class="gamma" size="2">
+									<a class="bg" href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>"><portlet:param name="struts_action" value="/ext/organization/edit_organization" /><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.EDIT %>" /><portlet:param name="inode" value="<%= String.valueOf(organization.getInode()) %>" /></portlet:actionURL>">
+									<strong><%=organization.getTitle()%></strong></a> 
+								</font>
+							</td>
+							<td>
+								<font class="gamma" size="2">
+									<%=(organization.isSystem()) ? "Yes" : "No" %>
+								</font>
+								<% if (organization.isSystem()) { %>
+								    &nbsp;(<a href="javascript:addOrganization('<%=organization.getInode()%>');">add child school</a>)
+								<% }%>
+							</td>
+							<td>
+								<font class="gamma" size="2">
+									<% if (UtilMethods.isSet(organization.getPartnerUrl())) { %>
+									<a href="<%=organization.getPartnerUrl()%>"><%=organization.getPartnerUrl()%></a>
+									<% } else {%>
+									&nbsp;
+									<% } %>
+								</font>
+							</td>
+
+						</tr>
+						<%
+							List childrenOrgs = OrganizationFactory.getChildrenOrganizations(organization, orderby);
+							Iterator childrenIter = childrenOrgs.iterator();
+							while (childrenIter.hasNext()) {
+								Organization childOrg = (Organization) childrenIter.next();
+							%>
+							<tr bgcolor="white">
+								<td width="50" nowrap align="center">
+									<a class="bg" href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>"><portlet:param name="struts_action" value="/ext/organization/edit_organization" /><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.EDIT %>" /><portlet:param name="inode" value="<%= String.valueOf(childOrg.getInode()) %>" /></portlet:actionURL>">
+									<img src="/portal/images/icon_edit.gif" border="0"></a><a href="javascript:deleteOrganization('<%= String.valueOf(childOrg.getInode()) %>')"><img src="/portal/images/icon_delete.gif" border="0"></a>
+								</td>
+								<td>
+									<font class="gamma" size="2">
+										&nbsp;&nbsp;&nbsp;&nbsp;
+										<a class="bg" href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>"><portlet:param name="struts_action" value="/ext/organization/edit_organization" /><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.EDIT %>" /><portlet:param name="inode" value="<%= String.valueOf(childOrg.getInode()) %>" /></portlet:actionURL>">
+										<%=childOrg.getTitle()%></a> 
+									</font>
+								</td>
+								<td>
+									<font class="gamma" size="2">
+										No
+									</font>
+								</td>
+								<td>
+									<font class="gamma" size="2">
+										<% if (UtilMethods.isSet(childOrg.getPartnerUrl())) { %>
+										<a href="<%=childOrg.getPartnerUrl()%>"><%=childOrg.getPartnerUrl()%></a>
+										<% } else {%>
+										&nbsp;
+										<% } %>
+									</font>
+								</td>
+							</tr>
+						<%}%>
+					<%}%>
+					<% if (organizations.size() ==0) { %>
+					<tr>
+						<td colspan="4" align=center>
+						<font class="bg" size="2">There are no Systems and/or Schools to show</font>
+						</td>
+					</tr>
+					<% } %>
+					<tr>
+						<td bgcolor="#eeeeee" colspan="4" align="right">
+							<button dojoType="dijit.form.Button" onClick="addSystem()">Add New System</button>							
+							<button dojoType="dijit.form.Button" onClick="addOrganization()">Add New School</button>
+						</td>
+					</tr>
+					<tr>
+							<td colspan="2" align=left>
+							<% if (minIndex != 0) { %>
+								<img src="<%= SKIN_COMMON_IMG %>/02_left.gif">
+								<font class="gamma" size="2"><strong>
+			   				<a class="bg" href="<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>"><portlet:param name="struts_action" value="/ext/organization/view_organizations" /><portlet:param name="pageNumber" value="<%= String.valueOf(pageNumber - 1) %>" /><portlet:param name="keywords" value="<%= keywords %>" /></portlet:renderURL>">Previous</a></b>
+								</font>
+							<% } %>
+							</td>
+							<td colspan="2" align=right>
+							<% if (maxIndex < organizations.size()) { %>
+								<font class="gamma" size="2"><strong>
+			   				<a class="bg" href="<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>"><portlet:param name="struts_action" value="/ext/organization/view_organizations" /><portlet:param name="pageNumber" value="<%= String.valueOf(pageNumber + 1) %>" /><portlet:param name="keywords" value="<%= keywords %>" /></portlet:renderURL>">Next</a></b>
+								</font>
+								<img src="<%= SKIN_COMMON_IMG %>/02_right.gif">
+							<% } %>
+							</td>
+						</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	</form>
+</liferay:box>
+

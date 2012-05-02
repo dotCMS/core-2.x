@@ -1,0 +1,1 @@
+ALTER TABLE links MODIFY `link_code` TEXT;

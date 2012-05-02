@@ -1,0 +1,69 @@
+<%@ page import="com.dotmarketing.business.APILocator" %>
+<%@ page import="com.dotmarketing.portlets.categories.business.CategoryAPI" %>
+<%@ page import="com.dotmarketing.portlets.categories.model.Category" %>
+<%@ include file="/html/portlet/ext/organization/init.jsp" %>
+<script language="JavaScript">
+	function showAllOrganizations() {
+		window.location.href = '<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>"><portlet:param name="struts_action" value="/ext/organization/view_organizations" /></portlet:renderURL>';
+	}
+	function search() {
+		form = document.getElementById('fm<portlet:namespace />');
+		form.action = '<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>"><portlet:param name="struts_action" value="/ext/organization/view_organizations" /></portlet:renderURL>';
+		submitForm(form);
+	}
+
+</script>
+<table align="center" border="0" cellpadding="2" cellspacing="0" height=90>
+	<html:form action="/ext/organization/view_organizations" styleId="fm_EXT_ORG_">
+	<tr>
+		<td>
+		</td>
+		<td>
+			Keywords: <html:text styleClass="form-text" property="keywords" size="45"/>
+		</td>
+	</tr>
+	<%
+		CategoryAPI catAPI = APILocator.getCategoryAPI();
+
+		com.dotmarketing.portlets.entities.model.Entity entity = com.dotmarketing.portlets.entities.factories.EntityFactory.getEntity("Organization");
+		java.util.List cats = com.dotmarketing.portlets.entities.factories.EntityFactory.getEntityCategories(entity);
+		Iterator catsIter = cats.iterator();
+		while (catsIter.hasNext()) {
+			com.dotmarketing.portlets.categories.model.Category category = (com.dotmarketing.portlets.categories.model.Category) catsIter.next();
+			List children = catAPI.getChildren(category);
+			pageContext.setAttribute("childrenCat",children.iterator());
+			if (children.size()>1) {
+	%>
+		<tr>
+			<td width="150">
+			<%= category.getCategoryName() %>:
+			</td>				
+			<td>
+			<html:select property="categories" size="1" style="width=275px;">
+          			  <option value=""><-- Select <%= category.getCategoryName() %> --></option>
+        		<html:options collection="childrenCat" labelProperty="categoryName" property="inode"/>
+        	</html:select>
+			</td>
+		</tr>
+			<% } %>
+	<% } %>	
+	<tr>
+		<td colspan="2" align="center">
+			<button dojoType="dijit.form.Button" type="submit"  name="Search" onClick="search()">Search</button>
+			<button dojoType="dijit.form.Button"  name="Show All" onClick="showAllOrganizations()">Show All</button>
+		</td>
+	</tr>
+	</html:form>
+	<tr><td height=100% colspan="2">&nbsp;</td></tr>
+</table>
+
+<table align=right>
+	<tr>
+		<td nowrap>
+   			<a class="bg" href="<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>"><portlet:param name="struts_action" value="/ext/organization/view_organizations" /></portlet:renderURL>">
+		  view all</a>
+			| <a class="bg" href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>"><portlet:param name="struts_action" value="/ext/organization/edit_organization" /><portlet:param name="system" value="true" /><portlet:param name="cmd" value="edit" /></portlet:actionURL>">new system</a>
+			| <a class="bg" href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>"><portlet:param name="struts_action" value="/ext/organization/edit_organization" /><portlet:param name="system" value="false" /><portlet:param name="cmd" value="edit" /></portlet:actionURL>">new school</a>
+		</td>
+	</tr>
+</table>

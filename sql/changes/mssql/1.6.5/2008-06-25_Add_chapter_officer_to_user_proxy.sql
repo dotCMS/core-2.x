@@ -1,0 +1,1 @@
+ALTER TABLE user_proxy ADD chapter_officer VARCHAR(255) DEFAULT NULL;

@@ -1,0 +1,122 @@
+/*
+
+Explorer Tree 1.4
+=================
+by Andrew Gregory <andrew@scss.com.au>
+http://www.scss.com.au/family/andrew/webdesign/explorertree/
+
+This work is licensed under the Creative Commons Attribution License. To view a
+copy of this license, visit http://creativecommons.org/licenses/by/1.0/ or send
+a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305,
+USA.
+
+*/
+
+/*
+ul.explorertree li { list-style-position: inside; }
+ul.explorertree, ul.explorertree ul, ul.explorertree li { margin: 0; padding: 0; }
+ul.explorertree ul { padding-left: 20px; } 
+ul.explorertree li { list-style-image: url(/html/dhtmltree/explorertree-bullet.png); list-style-type: square; }
+ul.explorertree li.explorertree-open { list-style-image: url(/html/dhtmltree/explorertree-minus.png); list-style-type: circle; }
+ul.explorertree li.explorertree-closed { list-style-image: url(/html/dhtmltree/explorertree-plus.png); list-style-type: disc; }
+ul.explorertree li.explorertree-open ul { display: block; }
+ul.explorertree li.explorertree-closed ul { display: none; }
+*/
+
+ul.explorertree, 
+ul.explorertree ul, 
+ul.explorertree li {
+	margin: 0; 
+	padding: 0; 
+}
+ul.explorertree{
+	padding-left: 35px;
+	border: 0: ;
+
+	padding-bottom: 10px;
+}
+ul.explorertree li { 
+	list-style-type: none; 
+	background-repeat: no-repeat; 
+	background-position: 2px 0px;
+	font-size: 12px;
+	padding-top: 4px; 
+
+	
+}
+
+ul.explorertree li.folder { 
+	
+	list-style-type: none;
+	background-repeat: no-repeat;
+	background-image: url(/html/dhtmltree/folder_open.gif); 
+	background-position: 2px 2px;
+	margin-left: -15px;
+	padding-left: 34px; 
+	cursor: hand;
+
+	
+}
+ul.explorertree a,
+ul.explorertree a:hover {
+	font-size: 12px;
+	text-decoration: none;
+}	
+ul.explorertree a:hover{
+	text-decoration: underline;
+}
+ul.explorertree li li{ 
+	padding-left: 15px;
+	margin-left: -15px;
+} /* sublist indentation */
+
+/* Set the bullet images */
+
+ul.explorertree li.explorertree-open ul,
+ul.explorertree li.explorertree-closed ul,
+ul.explorertree li.explorertree-open-last ul,
+ul.explorertree li.explorertree-closed-last ul,
+ul.explorertree ul {
+	padding-left: 22px;
+	margin-left: -22px;
+	cursor: hand;
+}
+
+
+ul.explorertree li.explorertree-open {
+	background-image: url(/html/dhtmltree/folder_open.gif);
+	background-position: 2px 2px;
+	margin-left: -15px;
+	padding-left: 34px;  
+	cursor: hand;
+}
+ul.explorertree li.explorertree-closed { 
+	background-image: url(/html/dhtmltree/folder_closed.gif); 
+	background-position: 2px 2px;
+	margin-left: -15px;
+	padding-left: 34px; 
+	cursor: hand;
+}
+
+
+/* Actually show and hide sublists */
+ul.explorertree li.explorertree-open-last ul {
+	display: block;
+	cursor: hand;
+	/*margin-left: -40px;
+	padding-left: 40px; 
+	background: #fff;
+	border-top: solid 1px red;
+	border-bottom: solid 1px red;*/
+}
+ul.explorertree li.explorertree-closed-last ul {
+	display: none; 
+}
+
+/* Actually show and hide sublists */
+ul.explorertree li.explorertree-open ul {
+	display: block; 
+}
+ul.explorertree li.explorertree-closed ul {
+	display: none; 
+}

@@ -1,0 +1,1 @@
+ALTER TABLE folder ADD COLUMN files_masks varchar(255);

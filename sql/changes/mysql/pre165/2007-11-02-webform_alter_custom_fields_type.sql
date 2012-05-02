@@ -1,0 +1,1 @@
+ALTER TABLE web_form MODIFY `custom_fields` TEXT(2000);

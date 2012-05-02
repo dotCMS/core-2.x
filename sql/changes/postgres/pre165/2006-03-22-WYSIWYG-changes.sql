@@ -1,0 +1,1 @@
+ALTER TABLE contentlet ADD COLUMN enabled_wysiwyg varchar(256);

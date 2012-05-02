@@ -1,0 +1,5 @@
+#if($field.fieldType == 'category')
+	<input type="hidden" name="$fieldAux.velocityVarName" id="$fieldAux.velocityVarName" value=""><span id="alert${fieldAux.velocityVarName}" class="errorMessages"></span>
+#else
+	<input type="hidden" name="$fieldAux.velocityVarName" id="$fieldAux.velocityVarName" value="$!fieldDefaultValue"><span id="alert${fieldAux.velocityVarName}" class="errorMessages"></span>
+#end

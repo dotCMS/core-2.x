@@ -1,0 +1,1 @@
+alter table report_parameter add unique (report_inode, parameter_name);

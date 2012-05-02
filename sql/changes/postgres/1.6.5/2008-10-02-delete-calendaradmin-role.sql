@@ -1,0 +1,1 @@
+delete from role_ where name like 'Calendar Admin';

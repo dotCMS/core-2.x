@@ -1,0 +1,307 @@
+<%@ include file="/html/portlet/ext/organization/init.jsp" %>
+<%@ page import="com.dotmarketing.portlets.organization.model.Organization" %>
+<%@ page import="com.dotmarketing.portlets.organization.factories.OrganizationFactory" %>
+<%@ page import="com.dotmarketing.portlets.organization.struts.OrganizationForm" %>
+<%@ page import="javax.servlet.jsp.PageContext" %>
+<%@ page import="com.dotmarketing.business.APILocator" %>
+<%@ page import="com.dotmarketing.portlets.categories.business.CategoryAPI" %>
+<%@ page import="com.dotmarketing.portlets.categories.model.Category" %>
+<%@ page import="com.dotmarketing.util.InodeUtils" %>
+<%@ include file="/html/common/messages_inc.jsp" %>
+<%
+	CategoryAPI catAPI = APILocator.getCategoryAPI();
+	OrganizationForm form = (OrganizationForm) request.getAttribute("OrganizationForm");
+%>
+
+<liferay:box top="/html/common/box_top.jsp" bottom="/html/common/box_bottom.jsp">
+<liferay:param name="box_title" value="<%=(form.isSystem()) ? "Add/Edit System" : "Add/Edit Organization" %>" />
+
+<script type='text/javascript' src='/dwr/interface/OrganizationAjax.js'></script>
+<script type='text/javascript' src='/dwr/engine.js'></script>
+<script type='text/javascript' src='/dwr/util.js'></script>
+<script src="/html/js/uuidUtils.js" type="text/javascript"></script>
+<script language="Javascript">
+<%@ include file="/html/portlet/ext/organization/edit_organization_js_inc.jsp" %>
+</script>
+
+<body onload="selectNewParent();submitParent();">
+
+	<table border="0" cellpadding="2" cellspacing="2" width="600" align="center">
+		<tr>
+			<td align="right" width="100%">
+			<span class="required"></span> &nbsp;<span class="mRed">Required Fields</span>
+			</td>
+		</tr>
+		<tr>
+			<td align="center" width="100%">
+				<BR>
+				<table border="0" cellpadding="2" cellspacing="2">
+
+				<html:form action="/ext/organization/edit_organization" styleId="fm" method="post">
+				<input name="<portlet:namespace /><%= Constants.CMD %>" type="hidden" value="">
+				<input name="<portlet:namespace />redirect" type="hidden" value="">
+				<html:hidden property="system" />
+				<html:hidden property="inode" />
+				<html:hidden property="parentOrganization" />
+				<!-- variable for image callback -->
+				<input type="hidden" name="submitParent" id="submitParent">
+				<!-- variables to save the small and the large image -->
+				<html:hidden property="logoImage" styleId="logoImage"/>
+				<html:hidden property="selectedlogoImage" styleId="selectedlogoImage"/>
+
+				<tr>
+					<td width="10">
+					<span class="required"></span> 
+					</td>
+					<td width="120">
+					School Name:
+					</td>				
+					<td>
+					<html:text styleClass="form-text" property="title" styleId="title" size="45"/>
+					</td>
+				</tr>
+				<tr>
+					<td width="10">
+					&nbsp;
+					</td>
+					<td width="120" nowrap>
+					Principal/HeadMaster Name:
+					</td>				
+					<td>
+					<html:text styleClass="form-text" property="ceoName" size="45"/>
+					</td>
+				</tr>
+				<%
+					com.dotmarketing.portlets.entities.model.Entity entity = com.dotmarketing.portlets.entities.factories.EntityFactory.getEntity("Organization");
+					java.util.List cats = com.dotmarketing.portlets.entities.factories.EntityFactory.getEntityCategories(entity);
+					Iterator catsIter = cats.iterator();
+					while (catsIter.hasNext()) {
+						com.dotmarketing.portlets.categories.model.Category category = (com.dotmarketing.portlets.categories.model.Category) catsIter.next();
+						List children = catAPI.getChildren(category);
+						pageContext.setAttribute("childrenCat",children.iterator());
+						if (children.size()>1) {
+				%>
+					<tr>
+						<td width="10">
+						<span class="required"></span> 
+						</td>
+						<td width="150">
+						<%= category.getCategoryName() %>:
+						</td>				
+						<td>
+						<html:select property="categories" size="1" style="width=275px;">
+			          		<option value=""><-- Select <%= category.getCategoryName() %> --></option>
+			        		<html:options collection="childrenCat" labelProperty="categoryName" property="inode"/>
+			        	</html:select>
+						</td>
+					</tr>
+						<% } %>
+				<% } %>
+				<% if (!form.isSystem()) { %>
+				<tr>
+					<td width="10">
+					&nbsp;
+					</td>
+					<td width="150">
+					Parent System:
+					</td>				
+					<td>
+					
+					<html:select property="parentSystem" styleId="parentSystem" size="1" style="width=275px;" onchange="selectNewParent()">
+		          		<option value=""><-- Select Parent System --></option>
+		        		<html:options collection="systems" labelProperty="title" property="inode"/>
+		        	</html:select>
+					
+					</td>
+				</tr>
+				<% } %>
+				</table>
+				<br>&nbsp;<BR>
+			</td>
+		</tr>
+		<tr>
+			<td>
+			<liferay:box top="/html/common/box_top.jsp" bottom="/html/common/box_bottom.jsp">
+			<liferay:param name="box_title" value="Private Label Information" />
+			<liferay:param name="box_width" value="600" />
+			<table border="0" cellpadding="2" cellspacing="2">
+				<tr>
+					<td width="10">
+					&nbsp;
+					</td>
+					<td width="150">
+						Private URL:
+					</td>
+					<td>
+					<html:text styleClass="form-text" property="partnerUrl" styleId="partnerUrl" size="25"/> (e.g. /myschoolurl)
+					</td>
+				</tr>
+				<tr>
+					<td width="10">
+					&nbsp;
+					</td>
+					<td width="150">
+						Secret Key:
+					</td>
+					<td>
+						<html:text styleClass="form-text" readonly="true" property="partnerKey" styleId="partnerKey" size="25"/>
+					    <button dojoType="dijit.form.Button" onClick="generatePartnerKey()" >
+						   Generate Key
+						</button>
+					</td>
+				</tr>
+				<tr>
+					<td width="10">
+					&nbsp;
+					</td>
+					<td width="150" valign="top">
+						School Logo:
+					</td>
+					<td>
+					<img id="logoImagePreview" src="/portal/images/shim.gif" width="100" height="100" border="1">
+					<div align="right" style="width:100px">
+					<img src="/portal/images/icon_upload.gif" onmouseup="smallPopUp(event);" style="cursor:hand;" width="16" height="16" border="0">
+					</div>
+					</td>
+				</tr>
+			</table>
+
+			<div id="logoImageDiv" style="visibility:hidden;position:absolute" class="contextMenuBox" style="display: none;">
+				<table width="100%">
+				<tr>
+					<td>
+					<div class="contextMenu" onmouseover="this.className='contextMenuHover';" onmouseout="this.className='contextMenu';" onCLick="browseTreeThumbNails('folders','logoImage');hideMenuPopUp('logoImageDiv');" width="100%">
+					Browse Image
+					</div>
+					</td>
+				</tr>
+					<tr>
+					<td>
+					<div class="contextMenu" onmouseover="this.className='contextMenuHover';" onmouseout="this.className='contextMenu';" onCLick="popupFileUpload('');hideMenuPopUp('logoImageDiv');" width="100%">
+					Upload Image
+					</div>
+					</td>
+				</tr>	
+				<tr>
+					<td>
+					<div class="contextMenu" onmouseover="this.className='contextMenuHover';" onmouseout="this.className='contextMenu';" onCLick="deletelogoImage();hideMenuPopUp('logoImageDiv');" width="100%">
+					Delete 
+					</div>		
+					</td>
+				</tr>
+				<tr>
+					<td>
+					<hr class="contextHR">
+					<div class="contextMenu" onmouseover="this.className='contextMenuHover';" onmouseout="this.className='contextMenu';" onCLick="hideMenuPopUp('logoImageDiv');" width="100%">
+						<img src="/portal/images/icons/close.gif" border="0" align="absmiddle">&nbsp;&nbsp;Close
+					</div>		
+					</td>
+				</tr>
+				</table>	
+			</div>
+
+			</liferay:box>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+			<liferay:box top="/html/common/box_top.jsp" bottom="/html/common/box_bottom.jsp">
+			<liferay:param name="box_title" value="<%=(form.isSystem()) ? "System HQ Address" : "School Address" %>" />
+			<liferay:param name="box_width" value="600" />
+			<table border="0" cellpadding="2" cellspacing="2">
+				<tr>
+					<td width="10">
+					<span class="required"></span> 
+					</td>
+					<td width="150">
+						Street1:
+					</td>
+					<td>
+					<html:text styleClass="form-text" property="street1" size="45"/>
+					</td>
+				</tr>
+				<tr>
+					<td width="10">
+					&nbsp;
+					</td>
+					<td width="150">
+						Street2:
+					</td>
+					<td>
+					<html:text styleClass="form-text" property="street2" size="45"/>
+					</td>
+				</tr>
+				<tr>
+					<td width="10">
+					<span class="required"></span> 
+					</td>
+					<td width="150">
+						City:
+					</td>
+					<td>
+					<html:text styleClass="form-text" property="city" size="45"/>
+					</td>
+				</tr>
+				<tr>
+					<td width="10">
+					<span class="required"></span> 
+					</td>
+					<td width="150">
+						State:
+					</td>
+					<td>
+					<html:text styleClass="form-text" property="state" size="45" maxlength="2"/>
+					</td>
+				</tr>
+				<tr>
+					<td width="10">
+					<span class="required"></span> 
+					</td>
+					<td width="150">
+						Zip:
+					</td>
+					<td>
+					<html:text styleClass="form-text" property="zip" size="45"/>
+					</td>
+				</tr>
+				<tr>
+					<td width="10">
+
+					</td>
+					<td width="150">
+						Phone:
+					</td>
+					<td>
+					<html:text styleClass="form-text" property="phone" size="45"/>
+					</td>
+				</tr>
+				<tr>
+					<td width="10">
+					&nbsp;
+					</td>
+					<td width="150">
+						Fax:
+					</td>
+					<td>
+					<html:text styleClass="form-text" property="fax" size="45"/>
+					</td>
+				</tr>
+			</table>
+			</liferay:box>
+			</td>
+		</tr>
+		<tr>
+			<td align="center">
+			  <%if(InodeUtils.isSet(form.getInode())){ %>
+				<button dojoType="dijit.form.Button" onClick="deleteOrganization(document.getElementById('fm'))">Delete</button>&nbsp; &nbsp;
+			<%}%>
+				<button dojoType="dijit.form.Button"  onClick="submitfm(document.getElementById('fm'))">Save</button>&nbsp; &nbsp;
+				<button dojoType="dijit.form.Button" onClick="cancelEdit()">Cancel</button>
+			</td>
+		</tr>
+	</table>
+	</html:form>
+</liferay:box>
+""  
+"" 
