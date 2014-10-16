@@ -198,4 +198,5 @@ public interface TemplateAPI {
 
     public Template copy(Template sourceTemplate, User user)throws DotDataException, DotSecurityException ;
 
+    public void invalidateTemplatePages(String templateInode, User user, boolean live, boolean respectFrontEndRoles) throws DotSecurityException, DotDataException;
 }

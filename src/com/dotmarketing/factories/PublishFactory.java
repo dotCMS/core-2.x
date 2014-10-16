@@ -172,12 +172,15 @@ public class PublishFactory {
 				
 				
 			}
-
+			Template oldTemplate = APILocator.getTemplateAPI().findLiveTemplate(webAsset.getIdentifier(), user, respectFrontendRoles);
             //Clean-up the cache for this template
             CacheLocator.getTemplateCache().remove( webAsset.getInode() );
             //writes the template to a live directory under velocity folder
 			TemplateServices.invalidate((Template)webAsset);
-
+			
+			if(((Template)webAsset).isDrawed() && !((Template)webAsset).getTheme().equals(oldTemplate.getTheme())){
+				APILocator.getTemplateAPI().invalidateTemplatePages(webAsset.getInode(), user, true, respectFrontendRoles);
+			}
 		}
 
 		if (webAsset instanceof HTMLPage) 
