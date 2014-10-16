@@ -513,14 +513,14 @@ public class TemplateAPIImpl extends BaseWebAssetAPI implements TemplateAPI {
     }
     
     /**
-     * 
-     * @param templateInode
-     * @param user
-     * @param live
-     * @param respectFrontEndRoles
-     * @throws DotDataException 
-     * @throws DotSecurityException 
-     */
+	 * Invalidate pages cache related to the specified template 
+	 * @param templateInode
+	 * @param user
+	 * @param live
+	 * @param respectFrontEndRoles
+	 * @throws DotSecurityException
+	 * @throws DotDataException
+	 */
     public void invalidateTemplatePages(String templateInode, User user, boolean live, boolean respectFrontEndRoles) throws DotSecurityException, DotDataException{
     	Template template = find(templateInode, user, respectFrontEndRoles);
   		List<HTMLPage> pagesForThisTemplate = APILocator.getTemplateAPI().getPagesUsingTemplate(template, APILocator.getUserAPI().getSystemUser(), false);
