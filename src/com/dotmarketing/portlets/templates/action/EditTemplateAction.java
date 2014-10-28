@@ -183,7 +183,6 @@ public class EditTemplateAction extends DotPortletAction implements
 			try {
 				if (Validator.validate(req, form, mapping)) {
 					Logger.debug(this, "Calling Save method for design template");
-					Logger.debug(this, "Calling Save method");
 					// the old template before editing using the inode from el request
 					oldTemplate = APILocator.getTemplateAPI().find(req.getParameter("inode"), user, false);
 					_saveWebAsset(req, res, config, form, user);
