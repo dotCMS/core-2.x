@@ -107,7 +107,9 @@ public class EditTemplateAction extends DotPortletAction implements
 		HibernateUtil.startTransaction();
 
 		User user = _getUser(req);
-
+		
+		// Old template used to compare against edited version
+		Template oldTemplate = new Template();
 		try {
 			Logger.debug(this, "Calling Retrieve method");
 			_retrieveWebAsset(req, res, config, form, user, Template.class,
@@ -181,6 +183,9 @@ public class EditTemplateAction extends DotPortletAction implements
 			try {
 				if (Validator.validate(req, form, mapping)) {
 					Logger.debug(this, "Calling Save method for design template");
+					Logger.debug(this, "Calling Save method");
+					// the old template before editing using the inode from el request
+					oldTemplate = APILocator.getTemplateAPI().find(req.getParameter("inode"), user, false);
 					_saveWebAsset(req, res, config, form, user);
 					String subcmd = req.getParameter("subcmd");
 					if ((subcmd != null) && subcmd.equals(com.dotmarketing.util.Constants.PUBLISH)) {
@@ -190,6 +195,12 @@ public class EditTemplateAction extends DotPortletAction implements
 							java.util.Map<String, String[]> params = new java.util.HashMap<String, String[]>();
 							params.put("struts_action",new String[] {"/ext/templates/view_templates"});
 							referer = PortletURLUtil.getActionURL(req,WindowState.MAXIMIZED.toString(),params);
+						}
+						// edited template from the form
+						Template template = (Template) req.getAttribute(WebKeys.TEMPLATE_FORM_EDIT);
+						// call for invalidation on the live cache if the theme changed
+						if(template.isDrawed() && !template.getTheme().equals(oldTemplate.getTheme())){
+							APILocator.getTemplateAPI().invalidateTemplatePages(template.getInode(), user, false, false);
 						}
 					}
 					try{
@@ -236,6 +247,12 @@ public class EditTemplateAction extends DotPortletAction implements
 						java.util.Map<String, String[]> params = new java.util.HashMap<String, String[]>();
 						params.put("struts_action",new String[] {"/ext/templates/view_templates"});
 						referer = PortletURLUtil.getActionURL(req,WindowState.MAXIMIZED.toString(),params);
+					}
+					// edited template from the form
+					Template template = (Template) req.getAttribute(WebKeys.TEMPLATE_FORM_EDIT);
+					// call for invalidation on the live cache if the theme changed
+					if(template.isDrawed() && !template.getTheme().equals(oldTemplate.getTheme())){
+						APILocator.getTemplateAPI().invalidateTemplatePages(template.getInode(), user, false, false);
 					}
 
 
