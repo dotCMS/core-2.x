@@ -75,7 +75,11 @@ public class IntegrityResource extends WebResource {
 
 	    STRUCTURES("push_publish_integrity_structures_conflicts",
 	    		"StructuresToCheck.csv",
-	    		"StructuresToFix.csv");
+	    		"StructuresToFix.csv"),
+
+		HTMLPAGES("push_publish_integrity_html_pages_conflicts",
+                "HtmlPagesToCheck.csv",
+                "HtmlPagesToFix.csv");
 
 	    private String label;
 	    private String dataToCheckCSVName;
@@ -360,6 +364,7 @@ public class IntegrityResource extends WebResource {
                                 Boolean foldersConflicts = false;
                                 Boolean structuresConflicts = false;
                                 Boolean schemesConflicts = false;
+								Boolean htmlPagesConflicts = false;
 
                                 IntegrityUtil integrityUtil = new IntegrityUtil();
         	        			try {
@@ -368,6 +373,7 @@ public class IntegrityResource extends WebResource {
         	        				foldersConflicts = integrityUtil.checkFoldersIntegrity(endpointId);
                                     structuresConflicts = integrityUtil.checkStructuresIntegrity(endpointId);
                                     schemesConflicts = integrityUtil.checkWorkflowSchemesIntegrity(endpointId);
+									htmlPagesConflicts = integrityUtil.checkHtmlPagesIntegrity(endpointId);
 
         	        				HibernateUtil.commitTransaction();
 
@@ -401,7 +407,7 @@ public class IntegrityResource extends WebResource {
 									}
         	        			}
 
-                                if ( !foldersConflicts && !structuresConflicts && !schemesConflicts ) {
+                                if ( !foldersConflicts && !structuresConflicts && !schemesConflicts && !htmlPagesConflicts) {
                                     String noConflictMessage;
                                     try {
                                         noConflictMessage = LanguageUtil.get( loggedUser.getLocale(), "push_publish_integrity_conflicts_not_found" );
@@ -772,6 +778,9 @@ public class IntegrityResource extends WebResource {
 					break;
 				case SCHEMES:
 					columns.add("name");
+					break;
+				case HTMLPAGES:
+					columns.add("html_page");
 					break;
 				}
 
