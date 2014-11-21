@@ -55,34 +55,32 @@ public class NavTool implements ViewTool {
             Logger.warn(this, e.getMessage(), e);
         }
     }
-    
+
     protected static NavResult getNav(Host host, String path) throws DotDataException, DotSecurityException {
-        
+
         if(path != null && path.contains(".")){
-        	path = path.substring(0, path.lastIndexOf("/"));
+            path = path.substring(0, path.lastIndexOf("/"));
         }
-        
+
         Folder folder=!path.equals("/") ? fAPI.findFolderByPath(path, host, user, true) : fAPI.findSystemFolder();
         if(folder==null || !UtilMethods.isSet(folder.getIdentifier()))
             return null;
-        
+
         NavResult result=navCache.getNav(host.getIdentifier(), folder.getInode());
-        
-	        if(result != null) {
-	        	 if(!folder.getInode().equals(FolderAPI.SYSTEM_FOLDER)) {
-	                 Identifier ident=APILocator.getIdentifierAPI().find(folder);
-	        	CacheLocator.getNavToolCache().removeNavByPath(ident.getHostId(), ident.getParentPath());
-	        	 }
-	        }
-	        
+
+        if(result != null) {
+
+            return result;
+
+        } else {
             String parentId;
             if(!folder.getInode().equals(FolderAPI.SYSTEM_FOLDER)) {
                 Identifier ident=APILocator.getIdentifierAPI().find(folder);
-                parentId=ident.getParentPath().equals("/") ? 
+                parentId=ident.getParentPath().equals("/") ?
                         FolderAPI.SYSTEM_FOLDER : fAPI.findFolderByPath(ident.getParentPath(), host, user, false).getInode();
-            }
-            else
+            } else {
                 parentId=null;
+            }
             result=new NavResult(parentId, host.getIdentifier(),folder.getInode());
             Identifier ident=APILocator.getIdentifierAPI().find(folder);
             result.setHref(ident.getURI());
@@ -94,13 +92,13 @@ public class NavTool implements ViewTool {
             List<String> folderIds=new ArrayList<String>();
             result.setChildren(children);
             result.setChildrenFolderIds(folderIds);
-        
+
             List menuItems;
             if(path.equals("/"))
                 menuItems = fAPI.findSubFolders(host, true);
             else
                 menuItems = fAPI.findMenuItems(folder, user, true);
-            
+
             for(Object item : menuItems) {
                 if(item instanceof Folder) {
                     Folder itemFolder=(Folder)item;
@@ -116,8 +114,8 @@ public class NavTool implements ViewTool {
                     children.add(nav);
                 }
                 else if(item instanceof HTMLPage) {
-                	final String httpProtocol = "http://";
-                	final String httpsProtocol = "https://";
+                    final String httpProtocol = "http://";
+                    final String httpsProtocol = "https://";
                     HTMLPage itemPage=(HTMLPage)item;
                     ident=APILocator.getIdentifierAPI().find(itemPage);
                     HTMLPage page = null;
@@ -127,17 +125,17 @@ public class NavTool implements ViewTool {
                     nav.setTitle(itemPage.getTitle());
                     if(UtilMethods.isSet(redirectUri) && !redirectUri.startsWith("/")){
                         if(redirectUri.startsWith(httpsProtocol) || redirectUri.startsWith(httpProtocol)){
-                      	  nav.setHref(redirectUri);	
+                            nav.setHref(redirectUri);
                         }else{
-                      	  	if(page.isHttpsRequired())
-                      	  		nav.setHref(httpsProtocol+redirectUri);	
-                        		else	
-                        			nav.setHref(httpProtocol+redirectUri);
+                            if(page.isHttpsRequired())
+                                nav.setHref(httpsProtocol+redirectUri);
+                            else
+                                nav.setHref(httpProtocol+redirectUri);
                         }
-                      	
-                      }else{
-                      	nav.setHref(ident.getURI());
-                      }
+
+                    }else{
+                        nav.setHref(ident.getURI());
+                    }
                     nav.setOrder(itemPage.getSortOrder());
                     nav.setType("htmlpage");
                     nav.setPermissionId(itemPage.getPermissionId());
@@ -155,6 +153,7 @@ public class NavTool implements ViewTool {
                     nav.setTitle(itemLink.getTitle());
                     nav.setOrder(itemLink.getSortOrder());
                     nav.setType("link");
+                    nav.setTarget(itemLink.getTarget());
                     nav.setPermissionId(itemLink.getPermissionId());
                     children.add(nav);
                 }
@@ -170,11 +169,11 @@ public class NavTool implements ViewTool {
                     children.add(nav);
                 }
             }
-            
+
             navCache.putNav(host.getIdentifier(), folder.getInode(), result);
-    
-        
-        return result;
+
+            return result;
+        }
     }
     
     public NavResult getNav() throws DotDataException, DotSecurityException {
