@@ -81,6 +81,7 @@ import com.dotmarketing.startup.runonce.Task01085CreateBundleTablesIfNotExists;
 import com.dotmarketing.startup.runonce.Task01090AddWorkflowSchemeUniqueNameContraint;
 import com.dotmarketing.startup.runonce.Task01095CreateIntegrityCheckerResultTables;
 import com.dotmarketing.startup.runonce.Task01096CreateContainerStructuresTable;
+import com.dotmarketing.startup.runonce.Task01097AddHtmlPageIR;
 
 
 public class TaskLocatorUtil {
@@ -165,6 +166,7 @@ public class TaskLocatorUtil {
         ret.add(Task01090AddWorkflowSchemeUniqueNameContraint.class);
         ret.add(Task01095CreateIntegrityCheckerResultTables.class);
         ret.add(Task01096CreateContainerStructuresTable.class);
+		ret.add(Task01097AddHtmlPageIR.class);
         return ret;
     }
 
