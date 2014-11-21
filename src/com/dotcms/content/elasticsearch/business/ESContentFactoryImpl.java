@@ -14,6 +14,7 @@ import java.util.StringTokenizer;
 import net.sf.hibernate.ObjectNotFoundException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.ElasticSearchException;
 import org.elasticsearch.action.count.CountRequestBuilder;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
@@ -891,108 +892,38 @@ public class ESContentFactoryImpl extends ContentletFactory {
 
 	@Override
 	protected List<Contentlet> findContentlets(List<String> inodes) throws DotDataException, DotStateException, DotSecurityException {
-		/*try {
-			Client client = new ESClient().getClient();
-
-			BoolQueryBuilder builder = QueryBuilders.boolQuery();
-			for (String inode : inodes) {
-				builder.should(QueryBuilders.fieldQuery("inode", inode));
-			}
-
-			SearchResponse response = client.prepareSearch().setQuery(builder).addSort("modDate", SortOrder.DESC).execute().actionGet();
-			SearchHits hits = response.hits();
-			List<Contentlet> cons = new ArrayList<Contentlet>();
-			for (int i = 0; i < hits.getTotalHits(); i++) {
-				try {
-					cons.add(find(hits.getAt(i).field("inode").value().toString()));
-				} catch (Exception e) {
-					throw new ElasticSearchException(e.getMessage());
-				}
-
-			}
-			return cons;
-		} catch (Exception e) {
-			throw new ElasticSearchException(e.getMessage());
-		}*/
-	    List<Contentlet> result = new ArrayList<Contentlet>();
-        List<String> inodesNotFound = new ArrayList<String>();
-        for (String i : inodes) {
-            Contentlet c = cc.get(i);
-            if(c != null && InodeUtils.isSet(c.getInode())){
-                result.add(c);
-            }else{
-                inodesNotFound.add(i);
+        ArrayList<Contentlet> result = new ArrayList<Contentlet>();
+        ArrayList<String> inodesNotFound = new ArrayList<String>();
+        for ( String i : inodes ) {
+            Contentlet c = cc.get( i );
+            if ( c != null && InodeUtils.isSet( c.getInode() ) ) {
+                result.add( c );
+            } else {
+                inodesNotFound.add( i );
             }
         }
-        if(!(inodesNotFound.size()>0)){
+        if ( inodesNotFound.isEmpty() ) {
             return result;
         }
-        StringBuilder buffy = new StringBuilder();
-        //http://jira.dotmarketing.net/browse/DOTCMS-5898
-        StringBuilder hql = new StringBuilder("select {contentlet.*} from contentlet join inode contentlet_1_ " +
-               "on contentlet_1_.inode = contentlet.inode and contentlet_1_.type = 'contentlet' where  ");
-        List<String> clauses = new ArrayList<String>();
-        int clauseCount =0;
-        boolean isNewClause = false;
 
-        if(inodesNotFound.size()>1000){
-            for (String inode : inodesNotFound) {
-                if(!(buffy.length()>0)){
-                    buffy.append("'"+ inode + "'");
-                }else{
-                    buffy.append(",'" + inode + "'");
-                }
-                clauseCount+=1;
-                if(clauseCount%1000==0){
-                    String clause = " contentlet.inode in (" + buffy.toString() + ")";
-                    buffy = new StringBuilder();
-                    clauses.add(clause);
-                    isNewClause = true;
-                }else{
-                    isNewClause = false;
-                }
+        final String hql = "select {contentlet.*} from contentlet join inode contentlet_1_ " +
+                "on contentlet_1_.inode = contentlet.inode and contentlet_1_.type = 'contentlet' where  contentlet.inode in ('";
 
+        for ( int init = 0; init < inodesNotFound.size(); init += 200 ) {
+            int end = Math.min( init + 200, inodesNotFound.size() );
+
+            HibernateUtil hu = new HibernateUtil( com.dotmarketing.portlets.contentlet.business.Contentlet.class );
+            hu.setSQLQuery( hql + StringUtils.join(inodesNotFound.subList(init, end), "','") + "')" );
+
+            List<com.dotmarketing.portlets.contentlet.business.Contentlet> fatties = hu.list();
+            for ( com.dotmarketing.portlets.contentlet.business.Contentlet fatty : fatties ) {
+                Contentlet con = convertFatContentletToContentlet( fatty );
+                result.add( con );
+                cc.add( con.getInode(), con );
             }
-            if(clauseCount>1000 && !isNewClause){
-                String finalClause = " contentlet.inode in (" + buffy.toString() + ")";
-                clauses.add(finalClause);
-            }
-            int inClauseCount=0;
-            for(String clause:clauses){
-                if(inClauseCount==0 || inClauseCount==clauses.size()){
-                    hql.append(" " + clause);
-                }else{
-                    hql.append(" or " + clause);
-                }
-                inClauseCount+=1;
-            }
-        }else{
-            for (String inode : inodesNotFound) {
-                if(!(buffy.length()>0)){
-                    buffy.append("'"+ inode + "'");
-                }else{
-                    buffy.append(",'" + inode + "'");
-                }
-            }
-            hql.append(" contentlet.inode in (" + buffy.toString() + ")");
+            HibernateUtil.getSession().clear();
         }
-        hql.append(" order by contentlet.inode");
 
-        int offSet = 0;
-        while(offSet<=inodesNotFound.size()){
-            HibernateUtil hu = new HibernateUtil(com.dotmarketing.portlets.contentlet.business.Contentlet.class);
-            hu.setSQLQuery(hql.toString());
-            hu.setMaxResults(500);
-            hu.setFirstResult(offSet);
-            List<com.dotmarketing.portlets.contentlet.business.Contentlet> fatties =  hu.list();
-            for (com.dotmarketing.portlets.contentlet.business.Contentlet fatty : fatties) {
-                Contentlet con = convertFatContentletToContentlet(fatty);
-                result.add(con);
-                cc.add(con.getInode(), con);
-            }
-            offSet+=500;
-            HibernateUtil.flush();
-        }
         return result;
 	}
 
