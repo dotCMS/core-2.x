@@ -197,5 +197,14 @@ public interface TemplateAPI {
     public Template find(String inode, User user, boolean respectFrontEndRoles) throws DotSecurityException, DotDataException;
 
     public Template copy(Template sourceTemplate, User user)throws DotDataException, DotSecurityException ;
-
+	/**
+	 * Invalidate pages cache related to the specified template 
+	 * @param templateInode
+	 * @param user
+	 * @param live
+	 * @param respectFrontEndRoles
+	 * @throws DotSecurityException
+	 * @throws DotDataException
+	 */
+    public void invalidateTemplatePages(String templateInode, User user, boolean live, boolean respectFrontEndRoles) throws DotSecurityException, DotDataException;
 }

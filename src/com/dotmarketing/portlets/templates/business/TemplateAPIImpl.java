@@ -37,6 +37,8 @@ import com.dotmarketing.portlets.folders.model.Folder;
 import com.dotmarketing.portlets.htmlpages.business.HTMLPageAPI.TemplateContainersReMap.ContainerRemapTuple;
 import com.dotmarketing.portlets.htmlpages.model.HTMLPage;
 import com.dotmarketing.portlets.templates.model.Template;
+import com.dotmarketing.services.PageServices;
+import com.dotmarketing.services.TemplateServices;
 import com.dotmarketing.util.InodeUtils;
 import com.dotmarketing.util.Logger;
 import com.dotmarketing.util.UtilMethods;
@@ -297,7 +299,9 @@ public class TemplateAPIImpl extends BaseWebAssetAPI implements TemplateAPI {
 
         //Adding the permissions for this Permissionable to cache
         permissionAPI.addPermissionsToCache( template );
-
+        if(template.isDrawed() && !template.getTheme().equals(oldTemplate.getTheme())){
+        	invalidateTemplatePages(template.getInode(), user, false, respectFrontendRoles);
+        }
 		return template;
 	}
 
@@ -506,5 +510,23 @@ public class TemplateAPIImpl extends BaseWebAssetAPI implements TemplateAPI {
     @Override
     public int deleteOldVersions(Date assetsOlderThan) throws DotStateException, DotDataException {
         return deleteOldVersions(assetsOlderThan,"template");
+    }
+    
+    /**
+	 * Invalidate pages cache related to the specified template 
+	 * @param templateInode
+	 * @param user
+	 * @param live
+	 * @param respectFrontEndRoles
+	 * @throws DotSecurityException
+	 * @throws DotDataException
+	 */
+    public void invalidateTemplatePages(String templateInode, User user, boolean live, boolean respectFrontEndRoles) throws DotSecurityException, DotDataException{
+    	Template template = find(templateInode, user, respectFrontEndRoles);
+  		List<HTMLPage> pagesForThisTemplate = APILocator.getTemplateAPI().getPagesUsingTemplate(template, APILocator.getUserAPI().getSystemUser(), false);
+  		for (HTMLPage page : pagesForThisTemplate) {
+  			//writes the page to a file
+  			PageServices.invalidate(page,live);
+  		}
     }
 }
