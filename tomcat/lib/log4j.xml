@@ -11,7 +11,7 @@
        	<param name="BufferSize" value="500" />
 		<param name="FailToSync" value="false" />
 		<appender-ref ref="FILE" />
-<!--		<appender-ref ref="CONSOLE" /> -->
+		<appender-ref ref="CONSOLE" />
     </appender>
 
     <appender name="ASYNC-TEST" class="org.apache.log4j.appender.ActiveAsynchronousAppender">

@@ -16,8 +16,6 @@ rem limitations under the License.
 
 rem ---------------------------------------------------------------------------
 rem Append to CLASSPATH
-rem
-rem $Id: cpappend.bat 562770 2007-08-04 22:13:58Z markt $
 rem ---------------------------------------------------------------------------
 
 rem Process the first argument

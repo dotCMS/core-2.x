@@ -119,6 +119,10 @@ public class DotJdtCompiler {
                    }
                    return result;
                }
+               
+               public boolean ignoreOptionalProblems() {
+            	   return true;
+               }
            }
    
            final INameEnvironment env = new INameEnvironment() {

@@ -17,8 +17,6 @@ rem limitations under the License.
 if "%OS%" == "Windows_NT" setlocal
 rem ---------------------------------------------------------------------------
 rem Version script for the CATALINA Server
-rem
-rem $Id: version.bat 908749 2010-02-10 23:26:42Z markt $
 rem ---------------------------------------------------------------------------
 
 rem Guess CATALINA_HOME if not defined
