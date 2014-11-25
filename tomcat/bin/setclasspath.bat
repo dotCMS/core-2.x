@@ -16,8 +16,6 @@ rem limitations under the License.
 
 rem ---------------------------------------------------------------------------
 rem Set CLASSPATH and Java options
-rem
-rem $Id: setclasspath.bat 908749 2010-02-10 23:26:42Z markt $
 rem ---------------------------------------------------------------------------
 
 rem Make sure prerequisite environment variables are set

@@ -17,8 +17,6 @@
 
 # -----------------------------------------------------------------------------
 # Start Script for the CATALINA Server
-#
-# $Id: startup.sh 562770 2007-08-04 22:13:58Z markt $
 # -----------------------------------------------------------------------------
 
 # Better OS/400 detection: see Bugzilla 31132
@@ -56,6 +54,7 @@ if $os400; then
 else
   if [ ! -x "$PRGDIR"/"$EXECUTABLE" ]; then
     echo "Cannot find $PRGDIR/$EXECUTABLE"
+    echo "The file is absent or does not have execute permission"
     echo "This file is needed to run this program"
     exit 1
   fi
