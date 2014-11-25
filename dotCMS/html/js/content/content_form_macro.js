@@ -785,30 +785,44 @@ function radioValid(element, radios, text) {
 
 //function to validate at a given number of checkboxes are checked	
 function checkboxValid(element, checkboxesLength, requiredNumber,text) {
-    text = Trim(text);
-	checkboxesLength=checkboxesLength-1;
+	text = Trim(text);
 	var varChecked=0;
-	for(var checkboxestoCheck=0;checkboxestoCheck<=checkboxesLength;checkboxestoCheck++)
-	{
-		if(element[checkboxestoCheck].checked)
+	if(checkboxesLength == undefined){
+		if(element.checked){
+			document.getElementById('alert'+element.name).innerHTML = "";
+		}else{
+			if(customErrorMessages[element.name] != ''){
+				document.getElementById('alert'+element.name).innerHTML = customErrorMessages[element.name];
+			}else{
+				document.getElementById('alert'+element.name).innerHTML = "Please select at least " + requiredNumber + " " + text + ".";
+			}
+			errorFieldName=element.id;
+			return false;
+		}
+	}else{
+		checkboxesLength=checkboxesLength-1;
+		for(var checkboxestoCheck=0;checkboxestoCheck<=checkboxesLength;checkboxestoCheck++)
 		{
-			varChecked++;
+			if(element[checkboxestoCheck].checked)
+			{
+				varChecked++;
+			}
+		}
+		if (varChecked < requiredNumber)
+		{
+			if(customErrorMessages[element[0].name] != ''){
+				document.getElementById('alert'+element[0].name).innerHTML = customErrorMessages[element[0].name];
+			}else{
+				document.getElementById('alert'+element[0].name).innerHTML = "Please select at least " + requiredNumber + " " + text + ".";
+			}
+			errorFieldName=element[0].id;
+			return false;
+		}else{
+			document.getElementById('alert'+element[0].name).innerHTML = "";
 		}
 	}
-	if (varChecked < requiredNumber)
-  	{
-		if(customErrorMessages[element[0].name] != ''){
-			document.getElementById('alert'+element[0].name).innerHTML = customErrorMessages[element[0].name];
-		}else{
- 	  	 document.getElementById('alert'+element[0].name).innerHTML = "Please select at least " + requiredNumber + " " + text + ".";
-		}
-		errorFieldName=element[0].id;
-		return false;
-	}else{
-         document.getElementById('alert'+element[0].name).innerHTML = "";
-    }
 	return true;
-	
+
 }
 
 //function to validate "other box" is not empty if checked	
