@@ -51,5 +51,5 @@ var tinyMCEProps = {
             paste_use_dialog : true,
             gecko_spellcheck : true,
             image_advtab: true,
-            file_browser_callback: cmsFileBrowser
+            file_browser_callback: 'cmsFileBrowser'
         };      
