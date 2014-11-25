@@ -985,7 +985,9 @@ public class IntegrityResource extends WebResource {
             if(whereToFix.equals("local")) {
             	HibernateUtil.startTransaction();
 
-            	integrityUtil.fixConflicts(endpointId, IntegrityType.valueOf(type.toUpperCase()));
+				HibernateUtil.startTransaction();
+				integrityUtil.fixConflicts(endpointId, IntegrityType.valueOf(type.toUpperCase()));
+				HibernateUtil.commitTransaction();
             	jsonResponse.put( "success", true );
         		jsonResponse.put( "message", "Conflicts fixed in Local Endpoint" );
 
