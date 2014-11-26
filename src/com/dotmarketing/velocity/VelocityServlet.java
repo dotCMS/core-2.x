@@ -47,6 +47,8 @@ import com.dotmarketing.beans.Host;
 import com.dotmarketing.beans.Identifier;
 import com.dotmarketing.beans.UserProxy;
 import com.dotmarketing.business.APILocator;
+import com.dotmarketing.business.BlockPageCache;
+import com.dotmarketing.business.BlockPageCache.PageCacheParameters;
 import com.dotmarketing.business.CacheLocator;
 import com.dotmarketing.business.PermissionAPI;
 import com.dotmarketing.business.portal.PortletAPI;
@@ -473,11 +475,16 @@ public abstract class VelocityServlet extends HttpServlet {
 		}
 
 		// Begin Page Caching
+		String userId = (user != null) ? user.getUserId() : "PUBLIC";
+		String language = (String) request.getSession().getAttribute(com.dotmarketing.util.WebKeys.HTMLPAGE_LANGUAGE);
+		String urlMap = (String) request.getAttribute(WebKeys.WIKI_CONTENTLET_INODE);
+		String queryString = request.getQueryString();
+		PageCacheParameters cacheParameters = new BlockPageCache.PageCacheParameters(userId, language, urlMap, queryString);
 		boolean buildCache = false;
 		String key = getPageCacheKey(request);
 		if (!timemachine && key!=null) {
 
-			String cachedPage = CacheLocator.getBlockDirectiveCache().get(key, (int) page.getCacheTTL());
+			String cachedPage = CacheLocator.getBlockPageCache().get(page, cacheParameters);
 
 			if (cachedPage == null || "refresh".equals(request.getParameter("dotcache"))
 					|| "refresh".equals(request.getAttribute("dotcache"))
@@ -517,7 +524,7 @@ public abstract class VelocityServlet extends HttpServlet {
 			synchronized (key) {				
 				//CacheLocator.getBlockDirectiveCache().clearCache();
 				CacheLocator.getHTMLPageCache().remove(page);
-				CacheLocator.getBlockDirectiveCache().add(getPageCacheKey(request), trimmedPage, (int) page.getCacheTTL());
+				CacheLocator.getBlockPageCache().add(page, trimmedPage, cacheParameters);
 			}
 		} else {
 			out.close();
@@ -1152,21 +1159,6 @@ public abstract class VelocityServlet extends HttpServlet {
 		StringBuilder sb = new StringBuilder();
 		sb.append(page.getInode());
 		sb.append("_" + page.getModDate().getTime());
-
-		String userId = (user != null) ? user.getUserId() : "PUBLIC";
-		sb.append("_" + userId);
-
-		String language = (String) request.getSession().getAttribute(com.dotmarketing.util.WebKeys.HTMLPAGE_LANGUAGE);
-		sb.append("_" + language);
-
-		String urlMap = (String) request.getAttribute(WebKeys.WIKI_CONTENTLET_INODE);
-		if (urlMap != null) {
-			sb.append("_" + urlMap);
-		}
-
-		if (UtilMethods.isSet(request.getQueryString())) {
-			sb.append("_" + request.getQueryString());
-		}
 
 		return sb.toString();
 
