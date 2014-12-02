@@ -20,7 +20,6 @@ import com.dotmarketing.common.db.DotConnect;
 import com.dotmarketing.db.DbConnectionFactory;
 import com.dotmarketing.db.HibernateUtil;
 import com.dotmarketing.exception.DotDataException;
-import com.dotmarketing.services.TemplateServices;
 import com.dotmarketing.util.AdminLogger;
 import com.dotmarketing.util.InodeUtils;
 import com.dotmarketing.util.Logger;
