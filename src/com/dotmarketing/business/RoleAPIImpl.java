@@ -4,9 +4,12 @@ import com.dotmarketing.db.HibernateUtil;
 import com.dotmarketing.exception.DotDataException;
 import com.dotmarketing.exception.DotHibernateException;
 import com.dotmarketing.exception.DotSecurityException;
+import com.dotmarketing.portlets.templates.model.Template;
+import com.dotmarketing.services.TemplateServices;
 import com.dotmarketing.util.Config;
 import com.dotmarketing.util.InodeUtils;
 import com.dotmarketing.util.Logger;
+import com.dotmarketing.util.UtilMethods;
 import com.liferay.portal.model.User;
 
 import java.util.ArrayList;
@@ -215,7 +218,13 @@ public class RoleAPIImpl implements RoleAPI {
 		
 		return rf.save(role);
 	}
-
+	
+	public Role save(Role role, String existingId) throws DotDataException, DotStateException {
+		if(role==null) return null;
+		
+		return rf.save(role, existingId);
+	}
+	
 	public List<Role> findRootRoles() throws DotDataException {
 		return rf.findRootRoles();
 	}
