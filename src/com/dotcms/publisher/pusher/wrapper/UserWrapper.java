@@ -2,7 +2,6 @@ package com.dotcms.publisher.pusher.wrapper;
 
 import com.dotcms.publisher.pusher.PushPublisherConfig.Operation;
 import com.dotmarketing.beans.UserProxy;
-import com.dotmarketing.business.Role;
 import com.liferay.portal.model.Address;
 import com.liferay.portal.model.User;
 
@@ -17,15 +16,13 @@ public class UserWrapper {
     private User user;
     private UserProxy userProxy;
     private List<Address> addresses;
-    private Role userRole;
 
     private Operation operation;
 
-    public UserWrapper ( User user, UserProxy userProxy, List<Address> addresses, Role userRole ) {
+    public UserWrapper ( User user, UserProxy userProxy, List<Address> addresses ) {
         this.user = user;
         this.userProxy = userProxy;
         this.addresses = addresses;
-        this.userRole = userRole;
     }
 
     public Operation getOperation () {
@@ -59,13 +56,5 @@ public class UserWrapper {
     public void setAddresses ( List<Address> addresses ) {
         this.addresses = addresses;
     }
-
-	public Role getUserRole() {
-		return userRole;
-	}
-
-	public void setUserRole(Role userRole) {
-		this.userRole = userRole;
-	}
 
 }
