@@ -13,6 +13,7 @@ import com.dotmarketing.business.DotStateException;
 import com.dotmarketing.util.ConfigUtils;
 import com.dotmarketing.util.Logger;
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class BundlerUtil {
@@ -104,14 +105,17 @@ public class BundlerUtil {
         if ( removeFirst && f.exists() )
             f.delete();
 
-        XStream xstream = new XStream( new DomDriver() );
+		 XStream xstream = new XStream( new DomDriver("UTF-8") );
 
         try {
-            if ( !f.exists() ) f.createNewFile();
-            BufferedWriter out = new BufferedWriter( new OutputStreamWriter ( new FileOutputStream( f ), "UTF8" ));
-            xstream.toXML( obj, out );
-            out.close();
+			if ( !f.exists() ){
+				f.createNewFile();
+			}
 
+			OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream( f ), "UTF-8");
+			HierarchicalStreamWriter xmlWriter = new DotPrettyPrintWriter(writer);
+			xstream.marshal(obj, xmlWriter);
+			writer.close();
 
         } catch ( FileNotFoundException e ) {
             Logger.error( PublisherUtil.class, e.getMessage(), e );
@@ -120,7 +124,6 @@ public class BundlerUtil {
         }
     }
 	
-	
 	/**
      * Deserialize an object back from XML
 	 *
@@ -128,9 +131,9 @@ public class BundlerUtil {
      * @return A deserialized object
 	 */
 	public static Object xmlToObject(File f){
-		XStream xstream = new XStream(new DomDriver());
+		XStream xstream = new XStream(new DomDriver("UTF-8"));
 
-		 BufferedInputStream input = null;
+		BufferedInputStream input = null;
 		try {
 			input = new BufferedInputStream(new FileInputStream(f));
 			Object ret = xstream.fromXML(input);
@@ -146,6 +149,5 @@ public class BundlerUtil {
 
 			}
 		}
-
 	}
 }
