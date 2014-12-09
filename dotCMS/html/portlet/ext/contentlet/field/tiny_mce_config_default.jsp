@@ -23,7 +23,7 @@ var tinyMCEProps = {
                 "advlist anchor autolink lists link image charmap print preview hr anchor pagebreak",
                 "searchreplace wordcount visualblocks visualchars code fullscreen",
                 "insertdatetime media nonbreaking save table contextmenu directionality",
-                "emoticons template paste textcolor spellchecker colorpicker textpattern validation dotimageclipboard compat3x"
+                "emoticons template paste textcolor spellchecker colorpicker textpattern compat3x"
             ],
             toolbar1: "styleselect | bold italic underline strikethrough |  alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image dotimageclipboard  | link unlink  | spellchecker <%= LicenseUtil.getLevel()>=200 ? ",validation":"" %>",
             spellchecker_language : "en_US",
@@ -52,5 +52,5 @@ var tinyMCEProps = {
             paste_use_dialog : true,
             gecko_spellcheck : true,
             image_advtab: true,
-            file_browser_callback: 'cmsFileBrowser'
+            file_browser_callback: cmsFileBrowser
         };      
