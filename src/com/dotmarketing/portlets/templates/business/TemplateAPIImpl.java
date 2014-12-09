@@ -299,7 +299,7 @@ public class TemplateAPIImpl extends BaseWebAssetAPI implements TemplateAPI {
 
         //Adding the permissions for this Permissionable to cache
         permissionAPI.addPermissionsToCache( template );
-        if(template.isDrawed() && !template.getTheme().equals(oldTemplate.getTheme())){
+        if(template.isDrawed() && oldTemplate !=null && !template.getTheme().equals(oldTemplate.getTheme())){
         	invalidateTemplatePages(template.getInode(), user, false, respectFrontendRoles);
         }
 		return template;
