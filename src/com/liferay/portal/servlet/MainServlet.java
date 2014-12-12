@@ -314,16 +314,6 @@ public class MainServlet extends ActionServlet {
 				sharedSessionIdCookie.setPath("/");
 
 				res.addCookie(sharedSessionIdCookie);
-				String headerStr = "";
-				
-				if(cookiesSecureFlag.equals("always") || (cookiesSecureFlag.equals("https") && req.isSecure())) {
-					headerStr = CookieKeys.SHARED_SESSION_ID + "=" + sharedSessionId + "; secure; "+cookiesHttpOnly+" ;Path=/";
-				} else { 
-					headerStr = CookieKeys.SHARED_SESSION_ID + "=" + sharedSessionId + "; "+ cookiesHttpOnly+ ";Path=/";
-				}
-					headerStr += "; Expires=Session;Max-Age=Session";
-
-				res.addHeader("SET-COOKIE", headerStr);
 
 				_log.debug("Shared session id is " + sharedSessionId);
 			}
