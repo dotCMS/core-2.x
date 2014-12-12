@@ -93,7 +93,7 @@ public class HostAPIImpl implements HostAPI {
 	    	}
 	    	if(list == null || list.size() ==0)
 	    		return createDefaultHost();
-				
+
 			else if (list.size() >1){
 				Logger.fatal(this, "More of one host is marked as default!!");
 			}
@@ -104,11 +104,11 @@ public class HostAPIImpl implements HostAPI {
 			}
 			throw new DotSecurityException("User : " + user.getUserId()+ " does not have permission to a host");
 		} catch (Exception e) {
-			
+
 			if(user!=null && !user.equals(APILocator.getUserAPI().getDefaultUser())){
 				Logger.error(HostAPIImpl.class, e.getMessage(), e);
 			}
-			
+
 			throw new DotRuntimeException(e.getMessage(), e);
 		}
 
@@ -355,7 +355,7 @@ public class HostAPIImpl implements HostAPI {
 		APILocator.getContentletAPI().copyProperties(c, host.getMap());;
 		c.setInode("");
 		c = APILocator.getContentletAPI().checkin(c, user, respectFrontendRoles);
-		APILocator.getContentletAPI().isInodeIndexed(c.getInode());
+
 		APILocator.getVersionableAPI().setLive(c);
 		Host savedHost =  new Host(c);
 
@@ -374,19 +374,20 @@ public class HostAPIImpl implements HostAPI {
 					hostCache.remove(otherHost);
 					otherHost.setDefault(false);
 					if(host.getMap().containsKey("_dont_validate_me"))
-					    otherHost.setProperty("_dont_validate_me",true);
+						otherHost.setProperty("_dont_validate_me",true);
 					if(host.getMap().containsKey("__disable_workflow__"))
-					    otherHost.setProperty("__disable_workflow__",true);
+						otherHost.setProperty("__disable_workflow__",true);
+
 					Contentlet cont = conAPI.checkin(otherHost, user, respectFrontendRoles);
-					conAPI.isInodeIndexed(cont.getInode());
 					if(isHostRunning) {
 						otherHost = new Host(cont);
 						publish(otherHost, user, respectFrontendRoles);
 					}
+
 				}
 			}
 		}
-		
+
 		hostCache.clearAliasCache();
 		return savedHost;
 
@@ -493,9 +494,9 @@ public class HostAPIImpl implements HostAPI {
 	public void delete(final Host host, final User user, final boolean respectFrontendRoles) {
 	    delete(host,user,respectFrontendRoles,false);
 	}
-	
+
 	public void delete(final Host host, final User user, final boolean respectFrontendRoles, boolean runAsSepareThread) {
-		
+
 
 		class DeleteHostThread extends Thread {
 
@@ -590,7 +591,7 @@ public class HostAPIImpl implements HostAPI {
 					}
 					StructureFactory.deleteStructure(structure);
 				}
-				
+
 				String[] assets = {"containers","template","htmlpage","links"};
 				for(String asset : assets) {
 				    dc.setSQL("select inode from "+asset+" where exists (select * from identifier where host_inode=? and id="+asset+".identifier)");
@@ -601,7 +602,7 @@ public class HostAPIImpl implements HostAPI {
 	                    dc.loadResult();
 	                }
 				}
-				
+
                 // kill bad identifiers pointing to the host
                 dc.setSQL("delete from identifier where host_inode=?");
                 dc.addParam(host.getIdentifier());
@@ -615,7 +616,7 @@ public class HostAPIImpl implements HostAPI {
 
 			}
 		}
-		
+
 		DeleteHostThread thread = new DeleteHostThread();
 
 		if(runAsSepareThread) {
@@ -758,7 +759,6 @@ public class HostAPIImpl implements HostAPI {
 		}
 		Contentlet c = APILocator.getContentletAPI().find(host.getInode(), user, respectFrontendRoles);
 		APILocator.getContentletAPI().publish(c, user, respectFrontendRoles);
-		APILocator.getContentletAPI().isInodeIndexed(c.getInode(),true);
 		hostCache.add(host);
 		hostCache.clearAliasCache();
 
