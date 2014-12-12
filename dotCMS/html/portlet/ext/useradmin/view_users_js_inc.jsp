@@ -956,6 +956,12 @@ function resetRoles () {
     filterOnlyUserRoles();
 }
 
+function resetUserRoles() {
+    var uId = document.getElementById("userId");
+    editUser(uId.value);
+
+}
+
 //Saves the current selection of roles
 function saveRoles () {
     UserAjax.updateUserRoles(currentUser.id, rolesAdded, saveRolesCallback);
