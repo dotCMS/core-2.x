@@ -437,6 +437,10 @@
 	      <param-name>compressor</param-name>
     	  <param-value>none</param-value>
 	  </init-param>
+	   <init-param>
+	      <param-name>crossDomainSessionSecurity</param-name>
+	      <param-value>false</param-value>
+	   </init-param>
 	</servlet>
 	<servlet>
 		<servlet-name>Captcha</servlet-name>
