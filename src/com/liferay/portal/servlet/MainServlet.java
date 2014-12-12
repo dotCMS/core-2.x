@@ -311,18 +311,7 @@ public class MainServlet extends ActionServlet {
 
 				Cookie sharedSessionIdCookie = new Cookie(CookieKeys.SHARED_SESSION_ID, sharedSessionId);
 				sharedSessionIdCookie.setMaxAge(86400);
-
-//				if(cookiesSecureFlag.equals("always")) {
-//					sharedSessionIdCookie.setSecure(true);
-//				} else if(cookiesSecureFlag.equals("https")) {
-//					sharedSessionIdCookie.setSecure(req.isSecure());
-//				} else if(cookiesSecureFlag.equals("never")) {
-//					sharedSessionIdCookie.setSecure(false);
-//				}
-
-				
-					sharedSessionIdCookie.setPath("/");
-//				}
+				sharedSessionIdCookie.setPath("/");
 
 				res.addCookie(sharedSessionIdCookie);
 				String headerStr = "";
