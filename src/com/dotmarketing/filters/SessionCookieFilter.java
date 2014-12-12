@@ -37,20 +37,29 @@ public class SessionCookieFilter implements Filter {
 
 		String cookiesSecureFlag = Config.getStringProperty("COOKIES_SECURE_FLAG", "https");
 
-		String cookiesHttpOnly = Config.getBooleanProperty("COOKIES_HTTP_ONLY", true)?"; HttpOnly;":"";
+		String cookiesHttpOnly = Config.getBooleanProperty("COOKIES_HTTP_ONLY", true)?"; HttpOnly;":";";
 		
 		Cookie[] cookies = request.getCookies();
 		
 		if(cookies!=null) {
+			
+			String headerStr = "";
 		
 			for(Cookie cookie : cookies){
+//				if(!cookie.getName().equals("JSESSIONID")) {
 					if(cookiesSecureFlag.equals("always") || (cookiesSecureFlag.equals("https") && req.isSecure())) {
-						response.setHeader("SET-COOKIE", cookie.getName() + "=" + cookie.getValue() + "; Path=/; secure" + cookiesHttpOnly);
+						headerStr = cookie.getName() + "=" + cookie.getValue() + "; Path=/; Version="+cookie.getVersion()+"; secure" + cookiesHttpOnly;
 					} else { 
-						response.setHeader("SET-COOKIE", cookie.getName() + "=" + cookie.getValue() + "; Path=/; " + cookiesHttpOnly);
+						headerStr = cookie.getName() + "=" + cookie.getValue() + "; Path=/; Version="+cookie.getVersion()+ cookiesHttpOnly;
 					}
-				}
-		
+					if(cookie.getName().equals("JSESSIONID") || cookie.getName().equals("DWRSESSIONID")) {
+						headerStr += "Expires=Session;Max-Age=Session";
+					}
+					
+					response.setHeader("SET-COOKIE", headerStr);
+//				}
+			}
+
 		}
 		
 
