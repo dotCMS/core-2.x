@@ -163,10 +163,8 @@ public class IdentifierCacheImpl extends IdentifierCache {
 
 	}
 	 
-	 public void removeFromCacheByInode(Versionable versionable) {
-		if(versionable != null && InodeUtils.isSet(versionable.getInode())){
-			 cache.remove(getVersionGroup() + versionable.getInode(), getVersionGroup());
-		}
+	 public void removeFromCacheByInode(String inode) {
+		 cache.remove(getVersionGroup() + inode, getVersionGroup());
 	 }
 	
 	
