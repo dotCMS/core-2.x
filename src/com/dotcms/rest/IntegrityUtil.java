@@ -36,6 +36,7 @@ import com.dotmarketing.exception.DotSecurityException;
 import com.dotmarketing.portlets.contentlet.model.Contentlet;
 import com.dotmarketing.portlets.folders.model.Folder;
 import com.dotmarketing.portlets.htmlpages.business.HTMLPageCache;
+import com.dotmarketing.portlets.htmlpages.model.HTMLPage;
 import com.dotmarketing.portlets.structure.model.Structure;
 import com.dotmarketing.portlets.workflows.business.WorkflowCache;
 import com.dotmarketing.portlets.workflows.model.WorkflowScheme;
@@ -1533,12 +1534,14 @@ public class IntegrityUtil {
 			String oldHtmlPageIdentifier = (String) result.get( "local_identifier" );
 			String newHtmlPageIdentifier = (String) result.get( "remote_identifier" );
 			String assetName = (String) result.get( "html_page" );
+			String localInode = (String) result.get( "local_inode" );
 
 			//We need only the last part of the url, not the whole path.
 			String[] assetNamebits = assetName.split("/");
 			assetName = assetNamebits[assetNamebits.length-1];
-
+			
 			htmlPageCache.remove(oldHtmlPageIdentifier);
+			CacheLocator.getIdentifierCache().removeFromCacheByInode(localInode);
 
 			//Fixing by SQL queries
 			dc.setSQL("INSERT INTO identifier(id, parent_path, asset_name, host_inode, asset_type, syspublish_date, sysexpire_date) "
