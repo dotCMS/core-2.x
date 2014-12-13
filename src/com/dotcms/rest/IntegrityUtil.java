@@ -1539,6 +1539,8 @@ public class IntegrityUtil {
 			String[] assetNamebits = assetName.split("/");
 			assetName = assetNamebits[assetNamebits.length-1];
 			
+			htmlPageCache.remove(oldHtmlPageIdentifier);
+			
 			HTMLPage page = APILocator.getHTMLPageAPI().loadWorkingPageById(oldHtmlPageIdentifier, APILocator.getUserAPI().getSystemUser(), false);
 			CacheLocator.getIdentifierCache().removeFromCacheByInode(page);
 
