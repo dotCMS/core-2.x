@@ -163,6 +163,7 @@ public class CookieUtil {
 					}
 
 					res.addHeader("SET-COOKIE", headerStr.toString());
+					headerStr.setLength(0);
 
 				}
 			}
