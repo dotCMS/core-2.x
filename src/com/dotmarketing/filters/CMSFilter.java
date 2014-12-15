@@ -53,6 +53,7 @@ import com.liferay.portal.language.LanguageException;
 import com.liferay.portal.language.LanguageUtil;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.User;
+import com.liferay.util.CookieUtil;
 import com.liferay.util.FileUtil;
 import com.liferay.util.StringPool;
 import com.liferay.util.Xss;
@@ -92,26 +93,9 @@ public class CMSFilter implements Filter {
         uri = URLDecoder.decode(uri, "UTF-8");
         
         // Handle the DWR Cookie
-        Cookie[] cookies = request.getCookies();
-        String cookiesSecureFlag = Config.getStringProperty("COOKIES_SECURE_FLAG", "https");
-		String cookiesHttpOnly = Config.getBooleanProperty("COOKIES_HTTP_ONLY", true)?";HttpOnly":"";
-
-		if(cookies!=null) {
-			String headerStr = "";
-			for(Cookie cookie : cookies){
-			
-				if(cookie.getName().equals("DWRSESSIONID")) {
-
-					if(cookiesSecureFlag.equals("always") || (cookiesSecureFlag.equals("https") && req.isSecure())) {
-						headerStr = cookie.getName() + "=" + cookie.getValue() + "; secure"+cookiesHttpOnly+" ;Path=/";
-					} else { 
-						headerStr = cookie.getName() + "=" + cookie.getValue() + cookiesHttpOnly+ ";Path=/";
-					}
-					response.addHeader("SET-COOKIE", headerStr);
-					break;
-				}
-			}
-		}
+        HashSet<String> cookieToHandle = new HashSet<String>();
+        cookieToHandle.add("DWRSESSIONID");
+        CookieUtil.setCookiesSecurityHeaders(request, response, cookieToHandle);
 
 		Company company = PublicCompanyFactory.getDefaultCompany();
 

@@ -297,10 +297,6 @@ public class MainServlet extends ActionServlet {
 
 		HttpSession ses = req.getSession();
 		
-		String cookiesSecureFlag = Config.getStringProperty("COOKIES_SECURE_FLAG", "https");
-
-		String cookiesHttpOnly = Config.getBooleanProperty("COOKIES_HTTP_ONLY", true)?";HttpOnly":"";
-
 		if (!GetterUtil.getBoolean(PropsUtil.get(PropsUtil.TCK_URL))) {
 			String sharedSessionId = CookieUtil.get(req.getCookies(), CookieKeys.SHARED_SESSION_ID);
 
@@ -312,7 +308,8 @@ public class MainServlet extends ActionServlet {
 				Cookie sharedSessionIdCookie = new Cookie(CookieKeys.SHARED_SESSION_ID, sharedSessionId);
 				sharedSessionIdCookie.setMaxAge(86400);
 				sharedSessionIdCookie.setPath("/");
-				sharedSessionIdCookie.setSecure(cookiesSecureFlag.equals("always") || (cookiesSecureFlag.equals("https") && req.isSecure()));
+				sharedSessionIdCookie.setSecure(Config.getStringProperty("COOKIES_SECURE_FLAG", "https").equals("always") 
+						|| (Config.getStringProperty("COOKIES_SECURE_FLAG", "https").equals("https") && req.isSecure()));
 
 				res.addCookie(sharedSessionIdCookie);
 
@@ -341,21 +338,7 @@ public class MainServlet extends ActionServlet {
 		
 		// COOKIES
 		
-		Cookie[] cookies = req.getCookies();
-		
-		if(cookies!=null) {
-			String headerStr = "";
-			for(Cookie cookie : cookies){
-
-				if(cookiesSecureFlag.equals("always") || (cookiesSecureFlag.equals("https") && req.isSecure())) {
-					headerStr = cookie.getName() + "=" + cookie.getValue() + "; secure"+cookiesHttpOnly+" ;Path=/";
-				} else { 
-					headerStr = cookie.getName() + "=" + cookie.getValue() + cookiesHttpOnly+ ";Path=/";
-				}
-
-				res.addHeader("SET-COOKIE", headerStr);
-			}
-		}
+		CookieUtil.setCookiesSecurityHeaders(req, res);
 		
 		// END COOKIES
 
