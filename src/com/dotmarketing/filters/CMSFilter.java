@@ -14,6 +14,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -55,6 +56,7 @@ import com.liferay.portal.model.User;
 import com.liferay.util.FileUtil;
 import com.liferay.util.StringPool;
 import com.liferay.util.Xss;
+
 import org.owasp.esapi.errors.EncodingException;
 
 public class CMSFilter implements Filter {
@@ -88,6 +90,28 @@ public class CMSFilter implements Filter {
         String uri = request.getRequestURI();
 
         uri = URLDecoder.decode(uri, "UTF-8");
+        
+        // Handle the DWR Cookie
+        Cookie[] cookies = request.getCookies();
+        String cookiesSecureFlag = Config.getStringProperty("COOKIES_SECURE_FLAG", "https");
+		String cookiesHttpOnly = Config.getBooleanProperty("COOKIES_HTTP_ONLY", true)?";HttpOnly":"";
+
+		if(cookies!=null) {
+			String headerStr = "";
+			for(Cookie cookie : cookies){
+			
+				if(cookie.getName().equals("DWRSESSIONID")) {
+
+					if(cookiesSecureFlag.equals("always") || (cookiesSecureFlag.equals("https") && req.isSecure())) {
+						headerStr = cookie.getName() + "=" + cookie.getValue() + "; secure"+cookiesHttpOnly+" ;Path=/";
+					} else { 
+						headerStr = cookie.getName() + "=" + cookie.getValue() + cookiesHttpOnly+ ";Path=/";
+					}
+					response.addHeader("SET-COOKIE", headerStr);
+					break;
+				}
+			}
+		}
 
 		Company company = PublicCompanyFactory.getDefaultCompany();
 
