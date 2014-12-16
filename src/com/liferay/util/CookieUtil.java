@@ -174,9 +174,35 @@ public class CookieUtil {
 
 				}
 			}
+		} 
+		
+		if(req.getCookies()==null || !containsCookie(req.getCookies(), "JSESSIONID")) {
+			StringBuilder headerStr = new StringBuilder();
+
+			if(Config.getStringProperty("COOKIES_SECURE_FLAG", "https").equals("always") 
+					|| (Config.getStringProperty("COOKIES_SECURE_FLAG", "https").equals("https") && req.isSecure())) {
+				String value = req.getSession().getId();
+				
+				if(Config.getBooleanProperty("COOKIES_HTTP_ONLY", false))
+					headerStr.append("JSESSIONID").append("=").append(value).append(";").append(SECURE).append(";").append(HTTP_ONLY).append(";Path=/");
+				else
+					headerStr.append("JSESSIONID").append("=").append(value).append(";").append(SECURE).append(";Path=/");
+
+				res.addHeader("SET-COOKIE", headerStr.toString());
+			}
 		}
 		
 		return res;
+	}
+	
+	private static boolean containsCookie(Cookie[] cookies, String name) {
+		if(cookies==null) return false;
+		
+		for (Cookie cookie : cookies) {
+			if(cookie.getName().equalsIgnoreCase(name))
+				return true;
+		}
+		return false;
 	}
 
 }
