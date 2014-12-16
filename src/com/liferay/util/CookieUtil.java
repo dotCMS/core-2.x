@@ -126,8 +126,8 @@ public class CookieUtil {
 	 * @param res the HttpServletResponse object
 	 */
 	
-	public static void setCookiesSecurityHeaders(HttpServletRequest req, HttpServletResponse res) {
-		setCookiesSecurityHeaders(req, res, null);
+	public static HttpServletResponse setCookiesSecurityHeaders(HttpServletRequest req, HttpServletResponse res) {
+		return setCookiesSecurityHeaders(req, res, null);
 	}
 	
 	
@@ -138,28 +138,35 @@ public class CookieUtil {
 	 * @cookies an optional list with the names of the cookies that will only be affected. 
 	 */
 	
-	public static void setCookiesSecurityHeaders(HttpServletRequest req, HttpServletResponse res, Set<String> cookies) {
+	public static HttpServletResponse setCookiesSecurityHeaders(HttpServletRequest req, HttpServletResponse res, Set<String> cookies) {
 		
 		if(req.getCookies()!=null) {
 			StringBuilder headerStr = new StringBuilder();
 			for(Cookie cookie : req.getCookies()){
 				
 				if(cookies==null || cookies.remove(cookie.getName())) {
+					
+					String value = cookie.getValue();
+					
+					if(cookie.getName().equals("JSESSIONID")) {
+						value = req.getSession().getId();
+					} 
+						
 
 					if(Config.getStringProperty("COOKIES_SECURE_FLAG", "https").equals("always") 
 							|| (Config.getStringProperty("COOKIES_SECURE_FLAG", "https").equals("https") && req.isSecure())) {
 
 						if(Config.getBooleanProperty("COOKIES_HTTP_ONLY", false))
-							headerStr.append(cookie.getName()).append("=").append(cookie.getValue()).append(";").append(SECURE).append(";").append(HTTP_ONLY).append(";Path=/");
+							headerStr.append(cookie.getName()).append("=").append(value).append(";").append(SECURE).append(";").append(HTTP_ONLY).append(";Path=/");
 						else 
-							headerStr.append(cookie.getName()).append("=").append(cookie.getValue()).append(";").append(SECURE).append(";Path=/");
+							headerStr.append(cookie.getName()).append("=").append(value).append(";").append(SECURE).append(";Path=/");
 
 					} else { 
 
 						if(Config.getBooleanProperty("COOKIES_HTTP_ONLY", false))
-							headerStr.append(cookie.getName()).append("=").append(cookie.getValue()).append(";").append(HTTP_ONLY).append(";Path=/");
+							headerStr.append(cookie.getName()).append("=").append(value).append(";").append(HTTP_ONLY).append(";Path=/");
 						else 
-							headerStr.append(cookie.getName()).append("=").append(cookie.getValue()).append(";Path=/");
+							headerStr.append(cookie.getName()).append("=").append(value).append(";Path=/");
 					}
 
 					res.addHeader("SET-COOKIE", headerStr.toString());
@@ -168,6 +175,8 @@ public class CookieUtil {
 				}
 			}
 		}
+		
+		return res;
 	}
 
 }
