@@ -93,9 +93,9 @@ public class CMSFilter implements Filter {
         uri = URLDecoder.decode(uri, "UTF-8");
         
         // Handle the DWR Cookie
-        HashSet<String> cookieToHandle = new HashSet<String>();
-        cookieToHandle.add("DWRSESSIONID");
-        CookieUtil.setCookiesSecurityHeaders(request, response, cookieToHandle);
+//        HashSet<String> cookieToHandle = new HashSet<String>();
+//        cookieToHandle.add("DWRSESSIONID");
+//        CookieUtil.setCookiesSecurityHeaders(request, response, cookieToHandle);
 
 		Company company = PublicCompanyFactory.getDefaultCompany();
 

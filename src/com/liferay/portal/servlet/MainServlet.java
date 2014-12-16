@@ -340,7 +340,7 @@ public class MainServlet extends ActionServlet {
 		
 		// COOKIES
 		
-		CookieUtil.setCookiesSecurityHeaders(req, res);
+//		CookieUtil.setCookiesSecurityHeaders(req, res);
 		
 		// END COOKIES
 
