@@ -92,20 +92,26 @@ String content_css = "content_css : \"" + Config.getStringProperty("WYSIWYG_CSS"
 
 %>
 
-<script language="javascript" type="text/javascript" src="/html/js/tinymce/jscripts/tiny_mce/tiny_mce_gzip.js"></script>
+<%if(Config.getBooleanProperty("ENABLE_GZIP",true)){ %>
+<script type="text/javascript" src="/html/js/tinymce/js/tinymce/tiny_mce_gzip.js"></script>
+<%}else { %>
+<script type="text/javascript" src="/html/js/tinymce/js/tinymce/tinymce.min.js"></script>
+<%}%>
 
 <script type="text/javascript">
 function setupTinyMce(){
-	tinyMCE_GZ.init({
-		themes : "advanced",
-		plugins : "noneditable",
-		languages : '<%= user.getLanguageId().substring(0,2) %>',
-		disk_cache : true,
-		readonly:true,
-		<%=content_css%>   
-		
-		}, function() {
-			tinyMCE.init({
+
+	if(<%=Config.getBooleanProperty("ENABLE_GZIP",true) %>){
+		tinyMCE_GZ.init({
+			themes : "advanced",
+			plugins : "noneditable",
+			languages : '<%= user.getLanguageId().substring(0,2) %>',
+			disk_cache : true,
+			readonly:true,
+			<%=content_css%>
+		});
+	}else{
+		tinymce.init({
 			mode : "textareas",
 			editor_deselector : "mceNoEditor",
 			theme : "advanced",
@@ -113,9 +119,10 @@ function setupTinyMce(){
 			plugins : "noneditable",
 			languages : '<%= user.getLanguageId().substring(0,2) %>',
 			disk_cache : true,
-			<%=content_css%>    
+			<%=content_css%>
+
 		});
-	});
+	}
 }
 
 
