@@ -302,7 +302,6 @@ public class ESIndexAPI {
     					}
     				    if(req.numberOfActions()>0) {
     				        req.execute().actionGet();
-    				        client.admin().indices().flush(new FlushRequest(index)).actionGet();
     				    }
 				    }
 				    finally {
