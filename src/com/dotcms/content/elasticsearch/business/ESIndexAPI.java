@@ -36,6 +36,7 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
+import org.elasticsearch.action.admin.indices.flush.FlushRequest;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.optimize.OptimizeRequest;
 import org.elasticsearch.action.admin.indices.optimize.OptimizeResponse;
@@ -219,7 +220,7 @@ public class ESIndexAPI {
 
 		boolean indexExists = indexExists(index);
 
-		Client client = new ESClient().getClient();
+
 
 		try {
 			if (!indexExists) {
@@ -230,8 +231,7 @@ public class ESIndexAPI {
 
 			ZipInputStream zipIn=new ZipInputStream(new FileInputStream(backupFile));
 			zipIn.getNextEntry();
-			br = new BufferedReader(
-			        new InputStreamReader(zipIn),500000);
+			br = new BufferedReader(new InputStreamReader(zipIn));
 
 			// setting number_of_replicas=0 to improve the indexing while restoring
 			// also we restrict the index to the current server
@@ -244,50 +244,70 @@ public class ESIndexAPI {
 			String mapping=br.readLine();
 			boolean mappingExists=mapping.startsWith(MAPPING_MARKER);
 			String type="content";
+			ArrayList<String> jsons = new ArrayList<String>();
 			if(mappingExists) {
 
 			    String patternStr = "^"+MAPPING_MARKER+"\\s*\\{\\s*\"(\\w+)\"";
 			    Pattern pattern = Pattern.compile(patternStr);
 			    Matcher matcher = pattern.matcher(mapping);
 			    boolean matchFound = matcher.find();
-			    if (matchFound)
-			        type = matcher.group(1);
+			    if (matchFound){
+			        type = matcher.group(1);   
+			    }
+			}else{
+				 jsons.add(mapping);
 			}
+			//null out mapping, it can be big
+			mapping=null;
+				
 
 			// reading content
-			ArrayList<String> jsons = new ArrayList<String>();
+
 
 			// we recover the line that wasn't a mapping so it should be content
-			if(!mappingExists)
-			    jsons.add(mapping);
 
-			for (int x = 0; x < 10000000; x++) {
-				for (int i = 0; i < 100; i++)
-					while (br.ready())
-						jsons.add(br.readLine());
-
+			ObjectMapper mapper = new ObjectMapper();
+			while(br.ready()){
+				//read in 100 lines
+				for (int i = 0; i < 100; i++){
+					if(!br.ready()){
+						break;
+					}
+					jsons.add(br.readLine());
+				}
+				
 				if (jsons.size() > 0) {
 				    try {
+						Client client = new ESClient().getClient();
     				    BulkRequestBuilder req = client.prepareBulk();
     				    for (String raw : jsons) {
     					    int delimidx=raw.indexOf(JSON_RECORD_DELIMITER);
     					    if(delimidx>0) {
         						String id = raw.substring(0, delimidx);
         						String json = raw.substring(delimidx + JSON_RECORD_DELIMITER.length(), raw.length());
-        						if (id != null)
-        						    req.add(new IndexRequest(index, type, id).source(json));
+        						if (id != null){
+        							@SuppressWarnings("unchecked")
+									Map<String, Object> oldMap= mapper.readValue(json, HashMap.class);
+        							Map<String, Object> newMap = new HashMap<String, Object>();
+        							
+        							for(String key : oldMap.keySet()){
+        								Object val = oldMap.get(key);
+        								if(val!= null && UtilMethods.isSet(val.toString())){
+        									newMap.put(key, oldMap.get(key));
+        								}
+        							}
+            						req.add(new IndexRequest(index, type, id).source(mapper.writeValueAsString(newMap)));
+        						}
     					    }
     					}
     				    if(req.numberOfActions()>0) {
     				        req.execute().actionGet();
-    				        //client.admin().indices().flush(new FlushRequest(index)).actionGet();
+    				        client.admin().indices().flush(new FlushRequest(index)).actionGet();
     				    }
 				    }
 				    finally {
-				        jsons.clear();
+				    	jsons = new ArrayList<String>();
 				    }
-				} else {
-					break;
 				}
 			}
 
